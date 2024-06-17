@@ -1,0 +1,7 @@
+﻿SRR,FTP Link,Title,File name
+SRX1738263,ftp.sra.ebi.ac.uk/vol1/fastq/SRR347/007/SRR3470727/SRR3470727.fastq.gz,ChIP-seq in siCTL,chip_sictl
+SRX1738264,ftp.sra.ebi.ac.uk/vol1/fastq/SRR347/008/SRR3470728/SRR3470728.fastq.gz,ChIP-seq in siGPS2,chip_sigps2
+SRX3581800,ftp.sra.ebi.ac.uk/vol1/fastq/SRR649/002/SRR6492252/SRR6492252.fastq.gz,GPS2 ChIP-seq in plus (with) FCCP treatment of 3T3-L1 cells,gps2_FCCP+_rep1
+SRX3581800,ftp.sra.ebi.ac.uk/vol1/fastq/SRR649/003/SRR6492253/SRR6492253.fastq.gz,GPS2 ChIP-seq in plus (with) FCCP treatment of 3T3-L1 cells,gps2_FCCP+_rep2
+SRX3581798,ftp.sra.ebi.ac.uk/vol1/fastq/SRR649/000/SRR6492250/SRR6492250.fastq.gz,GPS2 ChIP-seq in minus (no) FCCP treatment of 3T3-L1 cells,gps2_FCCP-_rep1
+SRX3581798,ftp.sra.ebi.ac.uk/vol1/fastq/SRR649/001/SRR6492251/SRR6492251.fastq.gz,GPS2 ChIP-seq in minus (no) FCCP treatment of 3T3-L1 cells,gps2_FCCP-_rep2

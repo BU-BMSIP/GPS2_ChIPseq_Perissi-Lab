@@ -1,0 +1,237 @@
+import pandas as pd
+
+# Read the CSV file and extract the list of filenames
+sample_csv = pd.read_csv('Sample_Data.csv', index_col='File name')
+NAMES = sample_csv.index.tolist()
+EXTENSIONS = [1, 2, 3, 4, 'rev.1', 'rev.2']
+REP = ['rep1', 'rep2']
+
+# Define the Snakemake rules
+rule all:
+    input:
+        expand('results/{name}_fastqc.html', name=NAMES),
+        expand('results/trimqc/{name}_trim.fastqc.html', name = NAMES),
+        expand('results/GRCm39.{ext}.bt2', ext=EXTENSIONS),
+        expand('results/view/{name}.txt', name = NAMES),
+        expand('results/flagstat/{name}.txt', name=NAMES),
+        'results/multiqc/multiqc_data/multiqc_report.html',
+        expand('results/bigwig/{name}.bw', name=NAMES),
+        'results/macs3/chip_sictl_peaks.narrowPeak',
+        expand('results/macs3/gps2_FCCP+_{rep}_peaks.narrowPeak', rep = REP)
+
+rule wget_files:
+    output:
+        'samples/{name}.fastq.gz'
+    params:
+        link = lambda wildcards: sample_csv.loc[wildcards.name, 'FTP Link'],
+        renamed = lambda wildcards: 'samples/{}.fastq.gz'.format(wildcards.name)
+    threads: 8
+    shell:
+        '''
+        wget -O {params.renamed} {params.link}
+        '''
+
+rule download_gtf:
+    output:
+        'samples/GRCm39_annotation.fa'
+    params:
+        fa = 'samples/GRCm39_annotation.fa.gz'
+    shell:
+        '''
+        wget -O {params.fa} https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M35/GRCm39.primary_assembly.genome.fa.gz
+        gunzip {params.fa}
+        '''
+
+rule fastqc:
+    input: 
+        fastq = 'samples/{name}.fastq.gz'
+    output:
+        fastqc = 'results/{name}_fastqc.html'
+    params:
+        outdir = 'results/'
+    threads: 4
+    conda:
+        'envs/fastqc_env.yml'
+    shell:
+        '''
+        fastqc {input.fastq} -o {params.outdir}
+        '''
+
+rule trimomatic:
+    input:
+        fastq = 'samples/{name}.fastq.gz',
+    output:
+        trimmed = 'results/trimmed/{name}_trim.fastq.gz'
+    params:
+        ad = 'samples/TruSeq3-SE.fa'
+    threads: 8
+    conda:
+        'envs/trimmomatic_env.yml'
+    shell:
+        '''
+        wget -O {params.ad} https://github.com/usadellab/Trimmomatic/raw/main/adapters/TruSeq3-SE.fa
+        mkdir -p results/trimmed
+        trimmomatic SE -threads {threads} {input.fastq} {output.trimmed} ILLUMINACLIP:{params.ad}:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+        '''
+
+rule fastqc_2:
+    input: 
+        fastq = 'results/trimmed/{name}_trim.fastq.gz'
+    output:
+        fastqc = 'results/trimqc/{name}_trim.fastqc.html'
+    params:
+        outdir = 'results/trimqc'
+    threads: 4
+    conda:
+        'envs/fastqc_env.yml'
+    shell:
+        '''
+        fastqc {input.fastq} -o {params.outdir}
+        '''
+
+rule bowtie2_build_gencode:
+    input:
+        fa = 'samples/GRCm39_annotation.fa'
+    output:
+        expand('results/GRCm39.{ext}.bt2', ext=EXTENSIONS)
+    params:
+        outdir = 'results/GRCm39'
+    threads: 16
+    conda:
+        'envs/bowtie2_env.yml'
+    shell:
+        '''
+        bowtie2-build {input.fa} {params.outdir}
+        '''
+
+rule unzip_fq:
+    input:
+        samples = 'results/trimmed/{name}_trim.fastq.gz'
+    output:
+        unzip = 'results/trimmed/{name}_trim.fastq'
+    threads: 8
+    shell:
+        '''
+        gunzip {input.samples}
+        '''
+
+rule bowtie2_align:
+    input:
+        samples = 'results/trimmed/{name}_trim.fastq'
+    output:
+        bam = 'results/aligned/{name}.bam'
+    threads: 16
+    params:
+        index = 'results/GRCm39'
+    conda:
+        'envs/bowtie2_env.yml'
+    shell:
+        '''
+        mkdir -p results/aligned
+        bowtie2 -x {params.index} -U {input.samples} | samtools view -bS - > {output.bam}
+        '''
+
+rule samtools_sort:
+    input:
+        bam = 'results/aligned/{name}.bam'
+    output:
+        sorted = 'results/sorted/{name}.sorted.bam'
+    conda:
+        'envs/samtools_env.yml'
+    threads: 8
+    shell:
+        '''
+        samtools sort -o {output.sorted} {input.bam} 
+        '''
+
+rule samtools_idxstats:
+    input:
+        sorted = 'results/sorted/{name}.sorted.bam'
+    output:
+        index = 'results/view/{name}.txt'
+    conda:
+        'envs/samtools_env.yml'
+    threads: 8
+    shell:
+        '''
+        mkdir -p results/view
+        samtools idxstats {input.sorted} > {output.index}
+        '''
+
+rule samtools_idx:
+    input:
+        filter = 'results/sorted/{name}.sorted.bam'
+    output:
+        index = 'results/sorted/{name}.sorted.bam.bai'
+    conda:
+        'envs/samtools_env.yml'
+    threads: 8
+    shell:
+        '''
+        samtools index {input.filter} {output.index}
+        '''
+
+rule samtools_flagstats:
+    input:
+        filter = 'results/sorted/{name}.sorted.bam'
+    output:
+        flagstat = 'results/flagstat/{name}.txt'
+    conda:
+        'envs/samtools_env.yml'
+    threads: 8
+    shell:
+        ''' 
+        samtools flagstat {input.filter} > {output.flagstat}
+        '''
+
+rule multiqc:
+    input:
+        expand('results/aligned/{name}.bam', name = NAMES)
+    output:
+        multiqc = 'results/multiqc/multiqc_data/multiqc_report.html'
+    params:
+        results = 'results/multiqc',
+        input = 'results/aligned/'
+    conda:
+        'envs/multiqc_env.yml'
+    shell:
+        '''
+        multiqc {params.input} --outdir {params.results} . 
+        '''
+
+rule bamCoverage:
+    input:
+        bam = 'results/sorted/{name}.sorted.bam',
+        bai = 'results/sorted/{name}.sorted.bam.bai'
+    output:
+        bigwig = 'results/bigwig/{name}.bw'
+    threads: 8
+    conda:
+        'envs/deeptools_env.yml'
+    shell:
+        '''
+        bamCoverage -b {input.bam} -o {output.bigwig} 
+        '''
+
+rule callpeak:
+    input:
+        wt = 'results/sorted/chip_sictl.sorted.bam',
+        ko = 'results/sorted/chip_sigps2.sorted.bam',
+        FCCPmin = expand('results/sorted/gps2_FCCP-_{rep}.sorted.bam', rep = REP),
+        FCCPplus = expand('results/sorted/gps2_FCCP+_{rep}.sorted.bam', rep = REP)
+    output:
+        chip = 'results/macs3/chip_sictl_peaks.narrowPeak',
+        gps2 = expand('results/macs3/gps2_FCCP+_{rep}_peaks.narrowPeak', rep=REP),
+    threads: 16
+    conda:
+        'envs/macs3_env.yml'
+    shell:
+        '''
+        macs3 callpeak -t {input.wt} -c {input.ko} -f BAM -g 2654621783 -n chip_sictl -B -q 0.01
+
+        for rep in {REP}; do
+            macs3 callpeak -t results/sorted/gps2_FCCP+_${{rep}}.sorted.bam \
+                           -c results/sorted/gps2_FCCP-${{rep}}.sorted.bam \
+                           -f BAM -g 2654621783 -n gps2_FCCP+_${{rep}} -B -q 0.01
+        done
+        '''
