@@ -1,0 +1,259 @@
+###########
+#PEAK DATA#
+###########
+
+Wild Type:
+    ATF4 - no peaks called
+    GPS2 - 3 peaks called
+            1. chip_sictl_NC (No control) - 39090
+            2. chip_sigps2_NC (No control) - 72195
+            3. chip_sictl (With ctl as treatment and gps2 as control) - 10544
+
+Differentiation:
+    ATF4 - 1 peak called
+            1. ATF4_noDMI (Human) - 22026
+    GPS2 - 2 peaks called
+            1. gps2_day0 - 13817
+            2. gps2_day6 - 48093
+
+Treatment:
+    ATF4 - 2 peaks
+            1. ATF4_ISR - 1041
+            2. ATF4_WT - 21031
+    GPS2 - 1 peak called
+            1. gps2_withFCCP - 2832
+
+________________________________________________________________________________________________
+####################
+#ANNOTATION RESULTS#
+####################
+
+Wild Type
+1. chip_sictl_NC (No control)
+        Promoter (<= 1kb): 50.46%
+        Distal Intergenic: 16.86%
+        Other Intron: 11.83%
+        Promoter (>1kb): 6.19%
+        1st Intron: 6.02%
+        Other Exon: 2.08%
+        3’ UTR (>1kb): 3.79%
+        5’ UTR: 1.49%
+        1st Exon: 1.46%
+        Downstream (<= 300): 0.1%
+        Other Exon: 0.09%
+
+2. chip_sigps2_NC (No control)
+        Promoter (<= 1kb): 32.59%
+        Distal Intergenic: 24.32%
+        Other Intron: 17.97%
+        1st Intron: 8.77%
+        Promoter (1-2kb): 6.03%
+        Promoter (2-3kb): 4.31%
+        Other Exon: 3.05%
+        3’ UTR: 1.51%
+        1st Exon: 1.2%
+        5’ UTR: 0.14%
+        Downstream (<= 300): 0.1%
+        
+3. chip_sictl (With ctl as treatment and gps2 as control)
+        Promoter (<= 1kb): 81.54%
+        Distal Intergenic: 7.89%
+        Other Intron: 4.44%
+        1st Intron: 1.85%
+        Promoter (1-2kb): 1.45%
+        1st Exon: 0.92%
+        Promoter (2-3kb): 0.95%
+        Other Exon: 0.55%
+        3’ UTR: 0.33%
+        5’ UTR: 0.05%
+        Downstream (<= 300): 0.02%
+
+Differentiation:
+4. ATF4_noDMI (Human)
+
+5. gps2_day0
+        Promoter (<= 1kb): 56.44%
+        Distal Intergenic: 15.35%
+        Other Intron: 9.69%
+        1st Intron: 4.2%
+        Other Exon: 4.05%
+        Promoter (1-2kb): 4.31%
+        1st Exon: 1.13%
+        3’ UTR: 1.3%
+        Promoter (2-3kb): 3.26%
+        5’ UTR: 0.21%
+        Downstream (<= 300): 0.04%
+
+6. gps2_day6
+        Promoter (<1kb): 38.38%
+        Distal Intergenic: 20.23%
+        Downstream (6-10kb): 14%
+        Distal Intron (6-10kb): 10%
+        Promoter (1-2kb): 5.8%
+        UTR3 (2-3kb): 4.39%
+        5’ UTR (0-300): 3%
+        UTR Exon: 2.6%
+        Other Intron (<300): 0.61%
+        Other Exon (1-300): 0.56%
+
+Treatment:
+7. ATF4_ISR
+        Distal Intergenic: 52.29%
+        Other Intron: 22.02%
+        Promoter (<= 1kb): 9.79%
+        1st Intron: 5.5%
+        Promoter (1-2kb): 3.98%
+        Promoter (2-3kb): 2.45%
+        1st Exon: 2.45%
+        3’ UTR: 0.92%
+        Other Exon: 0.61%
+
+8. ATF4_WT
+        Distal Intergenic (37.64%)
+        Other Intron (25.62%)
+        1st Intron (12.39%)
+        Promoter (<=1kb) (12.27%)
+        Promoter (1-2kb) (4.8%)
+        Promoter (2-3kb) (3.61%)
+        3' UTR (1.18%)
+        Other Exon (1.52%)
+        1st Exon (0.79%)
+        Downstream (<=300) (0.12%)
+        5' UTR (0.05%)
+
+9. gps2_withFCCP
+        Distal Intergenic (46.96%)
+        Other Intron (26.5%)
+        1st Intron (10.32%)
+        Promoter (<=1kb) (4.62%)
+        Promoter (2-3kb) (3.66%)
+        Other Exon (2.73%)
+        Promoter (1-2kb) (3.24%)
+        3' UTR (0.92%)
+        1st Exon (0.81%)
+        5' UTR (0.08%)
+        Downstream (<=300) (0.15%)
+
+________________________________________________________________________________________________
+###############
+#TOP 10 MOTIFS#
+###############
+
+Wild Type
+1. chip_sictl_NC (No control)
+        Motif Name	Consensus	P-value	Log P-value	q-value (Benjamini)	# of Target Sequences with Motif(of 35535)	% of Target Sequences with Motif	# of Background Sequences with Motif(of 34395)	% of Background Sequences with Motif
+        KLF1(Zf)/HUDEP2-KLF1-CutnRun(GSE136251)/Homer	VDGGGYGGGGCY	1e-201	-4.635e+02	0.0000	7537.0	21.21%	5214.3	15.16%
+        KLF5(Zf)/LoVo-KLF5-ChIP-Seq(GSE49402)/Homer	DGGGYGKGGC	1e-177	-4.092e+02	0.0000	9827.0	27.65%	7315.8	21.27%
+        Sp5(Zf)/mES-Sp5.Flag-ChIP-Seq(GSE72989)/Homer	RGKGGGCGGAGC	1e-174	-4.020e+02	0.0000	8594.0	24.18%	6255.8	18.19%
+        KLF3(Zf)/MEF-Klf3-ChIP-Seq(GSE44748)/Homer	NRGCCCCRCCCHBNN	1e-168	-3.886e+02	0.0000	4619.0	13.00%	2955.9	8.59%
+        Elk4(ETS)/Hela-Elk4-ChIP-Seq(GSE31477)/Homer	NRYTTCCGGY	1e-157	-3.622e+02	0.0000	4285.0	12.06%	2734.4	7.95%
+        Sp2(Zf)/HEK293-Sp2.eGFP-ChIP-Seq(Encode)/Homer	YGGCCCCGCCCC	1e-150	-3.465e+02	0.0000	10942.0	30.79%	8479.9	24.65%
+        ETS(ETS)/Promoter/Homer	AACCGGAAGT	1e-137	-3.172e+02	0.0000	2613.0	7.35%	1507.8	4.38%
+        Sp1(Zf)/Promoter/Homer	GGCCCCGCCCCC	1e-137	-3.169e+02	0.0000	3700.0	10.41%	2347.5	6.83%
+        ELF1(ETS)/Jurkat-ELF1-ChIP-Seq(SRA014231)/Homer	AVCCGGAAGT	1e-124	-2.874e+02	0.0000	3828.0	10.77%	2502.1	7.27%
+        GSC(Homeobox)/FrogEmbryos-GSC-ChIP-Seq(DRA000576)/Homer	RGGATTAR	1e-112	-2.591e+02	0.0000	3740.0	10.52%	2485.6	7.23%
+
+2. chip_sigps2_NC (No control)
+        Motif Name	Consensus	P-value	Log P-value	q-value (Benjamini)	# of Target Sequences with Motif(of 65303)	% of Target Sequences with Motif	# of Background Sequences with Motif(of 64523)	% of Background Sequences with Motif
+        Sp5(Zf)/mES-Sp5.Flag-ChIP-Seq(GSE72989)/Homer	RGKGGGCGGAGC	1e-106	-2.442e+02	0.0000	12388.0	18.97%	10168.9	15.76%
+        KLF1(Zf)/HUDEP2-KLF1-CutnRun(GSE136251)/Homer	VDGGGYGGGGCY	1e-93	-2.146e+02	0.0000	10942.0	16.75%	8967.2	13.90%
+        Sp2(Zf)/HEK293-Sp2.eGFP-ChIP-Seq(Encode)/Homer	YGGCCCCGCCCC	1e-88	-2.048e+02	0.0000	17048.0	26.10%	14683.6	22.76%
+        KLF5(Zf)/LoVo-KLF5-ChIP-Seq(GSE49402)/Homer	DGGGYGKGGC	1e-83	-1.934e+02	0.0000	15234.0	23.32%	13038.3	20.21%
+        Sp1(Zf)/Promoter/Homer	GGCCCCGCCCCC	1e-70	-1.621e+02	0.0000	4067.0	6.23%	3022.7	4.69%
+        KLF3(Zf)/MEF-Klf3-ChIP-Seq(GSE44748)/Homer	NRGCCCCRCCCHBNN	1e-66	-1.542e+02	0.0000	6235.0	9.55%	4952.9	7.68%
+        Elk4(ETS)/Hela-Elk4-ChIP-Seq(GSE31477)/Homer	NRYTTCCGGY	1e-63	-1.459e+02	0.0000	5673.0	8.69%	4482.7	6.95%
+        SeqBias: polyA-repeat	AAAAAAAAAA	1e-48	-1.118e+02	0.0000	62492.0	95.68%	60907.5	94.41%
+        KLF14(Zf)/HEK293-KLF14.GFP-ChIP-Seq(GSE58341)/Homer	RGKGGGCGKGGC	1e-48	-1.110e+02	0.0000	19916.0	30.49%	17998.7	27.90%
+        ELF1(ETS)/Jurkat-ELF1-ChIP-Seq(SRA014231)/Homer	AVCCGGAAGT	1e-47	-1.091e+02	0.0000	5131.0	7.86%	4140.5	6.42%
+
+3. chip_sictl (With ctl as treatment and gps2 as control)
+        Motif Name	Consensus	P-value	Log P-value	q-value (Benjamini)	# of Target Sequences with Motif(of 10059)	% of Target Sequences with Motif	# of Background Sequences with Motif(of 34192)	% of Background Sequences with Motif
+        Elk4(ETS)/Hela-Elk4-ChIP-Seq(GSE31477)/Homer	NRYTTCCGGY	1e-209	-4.830e+02	0.0000	2212.0	21.99%	3819.3	11.17%
+        ETS(ETS)/Promoter/Homer	AACCGGAAGT	1e-195	-4.497e+02	0.0000	1431.0	14.23%	2050.6	6.00%
+        ELF1(ETS)/Jurkat-ELF1-ChIP-Seq(SRA014231)/Homer	AVCCGGAAGT	1e-192	-4.430e+02	0.0000	1971.0	19.59%	3341.1	9.77%
+        KLF1(Zf)/HUDEP2-KLF1-CutnRun(GSE136251)/Homer	VDGGGYGGGGCY	1e-163	-3.768e+02	0.0000	3308.0	32.89%	7227.6	21.14%
+        ETS1(ETS)/Jurkat-ETS1-ChIP-Seq(GSE17954)/Homer	ACAGGAAGTG	1e-163	-3.764e+02	0.0000	2004.0	19.92%	3641.1	10.65%
+        GABPA(ETS)/Jurkat-GABPa-ChIP-Seq(GSE17954)/Homer	RACCGGAAGT	1e-160	-3.694e+02	0.0000	2029.0	20.17%	3730.8	10.91%
+        Fli1(ETS)/CD8-FLI-ChIP-Seq(GSE20898)/Homer	NRYTTCCGGH	1e-149	-3.454e+02	0.0000	2581.0	25.66%	5306.3	15.52%
+        Elk1(ETS)/Hela-Elk1-ChIP-Seq(GSE31477)/Homer	HACTTCCGGY	1e-145	-3.341e+02	0.0000	2158.0	21.45%	4202.1	12.29%
+        Sp5(Zf)/mES-Sp5.Flag-ChIP-Seq(GSE72989)/Homer	RGKGGGCGGAGC	1e-138	-3.193e+02	0.0000	3766.0	37.44%	8894.6	26.02%
+        Sp1(Zf)/Promoter/Homer	GGCCCCGCCCCC	1e-138	-3.189e+02	0.0000	2158.0	21.45%	4264.4	12.47%
+
+Differentiation:
+4. ATF4_noDMI (Human)
+        Motif Name	Consensus	P-value	Log P-value	q-value (Benjamini)	# of Target Sequences with Motif(of 6643)	% of Target Sequences with Motif	# of Background Sequences with Motif(of 39397)	% of Background Sequences with Motif
+        Chop(bZIP)/MEF-Chop-ChIP-Seq(GSE35681)/Homer	ATTGCATCAT	1e-2945	-6.783e+03	0.0000	3160.0	47.57%	1111.0	2.82%
+        Atf4(bZIP)/MEF-Atf4-ChIP-Seq(GSE35681)/Homer	MTGATGCAAT	1e-2903	-6.686e+03	0.0000	3274.0	49.28%	1297.2	3.30%
+        AARE(HLH)/mES-cMyc-ChIP-Seq/Homer	GATTGCATCA	1e-2594	-5.974e+03	0.0000	2261.0	34.04%	436.6	1.11%
+        CEBP:AP1(bZIP)/ThioMac-CEBPb-ChIP-Seq(GSE21512)/Homer	DRTGTTGCAA	1e-1795	-4.134e+03	0.0000	3386.0	50.97%	3242.6	8.24%
+        HLF(bZIP)/HSC-HLF.Flag-ChIP-Seq(GSE69817)/Homer	RTTATGYAAB	1e-1156	-2.662e+03	0.0000	2781.0	41.86%	3379.4	8.59%
+        NFIL3(bZIP)/HepG2-NFIL3-ChIP-Seq(Encode)/Homer	VTTACGTAAYNNNNN	1e-1023	-2.358e+03	0.0000	2263.0	34.07%	2389.0	6.07%
+        Atf1(bZIP)/K562-ATF1-ChIP-Seq(GSE31477)/Homer	GATGACGTCA	1e-287	-6.629e+02	0.0000	1357.0	20.43%	2671.3	6.79%
+        CEBP:CEBP(bZIP)/MEF-Chop-ChIP-Seq(GSE35681)/Homer	NTNATGCAAYMNNHTGMAAY	1e-268	-6.190e+02	0.0000	653.0	9.83%	686.0	1.74%
+        Fos(bZIP)/TSC-Fos-ChIP-Seq(GSE110950)/Homer	NDATGASTCAYN	1e-190	-4.395e+02	0.0000	1039.0	15.64%	2208.6	5.61%
+        Fra2(bZIP)/Striatum-Fra2-ChIP-Seq(GSE43429)/Homer	GGATGACTCATC	1e-190	-4.387e+02	0.0000	875.0	13.17%	1648.1	4.19%
+        JunB(bZIP)/DendriticCells-Junb-ChIP-Seq(GSE36099)/Homer	RATGASTCAT	1e-185	-4.270e+02	0.0000	955.0	14.38%	1951.1	4.96%
+
+5. gps2_day0
+        Motif Name	Consensus	P-value	Log P-value	q-value (Benjamini)	# of Target Sequences with Motif(of 11913)	% of Target Sequences with Motif	# of Background Sequences with Motif(of 33369)	% of Background Sequences with Motif
+        Elk4(ETS)/Hela-Elk4-ChIP-Seq(GSE31477)/Homer	NRYTTCCGGY	1e-16	-3.843e+01	0.0000	1389.0	11.66%	3113.3	9.33%
+        E2F4(E2F)/K562-E2F4-ChIP-Seq(GSE31477)/Homer	GGCGGGAAAH	1e-14	-3.331e+01	0.0000	1251.0	10.50%	2816.9	8.45%
+        SeqBias: CG-repeat	CGCGCGCGCG	1e-14	-3.257e+01	0.0000	5796.0	48.64%	15049.4	45.12%
+        ABF1/SacCer-Promoters/Homer	CGTRNAAARTGA	1e-13	-3.020e+01	0.0000	420.0	3.52%	805.1	2.41%
+        CTCF(Zf)/CD4+-CTCF-ChIP-Seq(Barski_et_al.)/Homer	AYAGTGCCMYCTRGTGGCCA	1e-12	-2.895e+01	0.0000	311.0	2.61%	563.3	1.69%
+        DEL2(E2FDP)/col-DEL2-DAP-Seq(GSE60143)/Homer	WTTTCSCGCC	1e-11	-2.706e+01	0.0000	586.0	4.92%	1220.3	3.66%
+        AT1G28160(AP2EREBP)/colamp-AT1G28160-DAP-Seq(GSE60143)/Homer	GGCGGCGG	1e-10	-2.499e+01	0.0000	5188.0	43.53%	13517.7	40.53%
+        ELF1(ETS)/Jurkat-ELF1-ChIP-Seq(SRA014231)/Homer	AVCCGGAAGT	1e-9	-2.268e+01	0.0000	1201.0	10.08%	2810.7	8.43%
+        CAMTA1(CAMTA)/col-CAMTA1-DAP-Seq(GSE60143)/Homer	WWAACGCGTT	1e-9	-2.189e+01	0.0000	1079.0	9.05%	2506.9	7.52%
+        GSC(Homeobox)/FrogEmbryos-GSC-ChIP-Seq(DRA000576)/Homer	RGGATTAR	1e-9	-2.167e+01	0.0000	617.0	5.18%	1341.9	4.02%
+6. gps2_day6
+        Motif Name	Consensus	P-value	Log P-value	q-value (Benjamini)	# of Target Sequences with Motif(of 44542)	% of Target Sequences with Motif	# of Background Sequences with Motif(of 35947)	% of Background Sequences with Motif
+        OCT:OCT(POU,Homeobox)/NPC-OCT6-ChIP-Seq(GSE43916)/Homer	YATGCATATRCATRT	1e-130	-2.998e+02	0.0000	1265.0	2.84%	474.5	1.32%
+        E2F4(E2F)/K562-E2F4-ChIP-Seq(GSE31477)/Homer	GGCGGGAAAH	1e-41	-9.574e+01	0.0000	3309.0	7.43%	2099.3	5.86%
+        Elk4(ETS)/Hela-Elk4-ChIP-Seq(GSE31477)/Homer	NRYTTCCGGY	1e-33	-7.785e+01	0.0000	4103.0	9.22%	2734.8	7.64%
+        AT1G28160(AP2EREBP)/colamp-AT1G28160-DAP-Seq(GSE60143)/Homer	GGCGGCGG	1e-30	-7.018e+01	0.0000	14453.0	32.46%	10721.9	29.93%
+        ELF1(ETS)/Jurkat-ELF1-ChIP-Seq(SRA014231)/Homer	AVCCGGAAGT	1e-28	-6.638e+01	0.0000	3682.0	8.27%	2465.7	6.88%
+        Arnt:Ahr(bHLH)/MCF7-Arnt-ChIP-Seq(Lo_et_al.)/Homer	TBGCACGCAA	1e-27	-6.408e+01	0.0000	4878.0	10.96%	3365.5	9.40%
+        YY1(Zf)/Promoter/Homer	CAAGATGGCGGC	1e-23	-5.307e+01	0.0000	1528.0	3.43%	945.4	2.64%
+        NAP(NAC)/col-NAP-DAP-Seq(GSE60143)/Homer	ARGTTACGTRTN	1e-22	-5.151e+01	0.0000	3070.0	6.90%	2069.9	5.78%
+        NAM(NAC)/col-NAM-DAP-Seq(GSE60143)/Homer	RGTTRCGTRW	1e-21	-5.016e+01	0.0000	4484.0	10.07%	3132.8	8.75%
+        ETS(ETS)/Promoter/Homer	AACCGGAAGT	1e-20	-4.737e+01	0.0000	2359.0	5.30%	1561.3	4.36%
+
+Treatment:
+7. ATF4_WT
+        Motif Name	Consensus	P-value	Log P-value	q-value (Benjamini)	# of Target Sequences with Motif(of 20639)	% of Target Sequences with Motif	# of Background Sequences with Motif(of 28406)	% of Background Sequences with Motif
+        Atf4(bZIP)/MEF-Atf4-ChIP-Seq(GSE35681)/Homer	MTGATGCAAT	1e-10749	-2.475e+04	0.0000	10813.0	52.39%	789.7	2.78%
+        Chop(bZIP)/MEF-Chop-ChIP-Seq(GSE35681)/Homer	ATTGCATCAT	1e-10398	-2.394e+04	0.0000	9853.0	47.74%	601.9	2.12%
+        AARE(HLH)/mES-cMyc-ChIP-Seq/Homer	GATTGCATCA	1e-7845	-1.806e+04	0.0000	6256.0	30.31%	213.7	0.75%
+        CEBP:AP1(bZIP)/ThioMac-CEBPb-ChIP-Seq(GSE21512)/Homer	DRTGTTGCAA	1e-7006	-1.613e+04	0.0000	11767.0	57.01%	2321.8	8.17%
+        HLF(bZIP)/HSC-HLF.Flag-ChIP-Seq(GSE69817)/Homer	RTTATGYAAB	1e-3666	-8.443e+03	0.0000	8899.0	43.12%	2553.8	8.99%
+        NFIL3(bZIP)/HepG2-NFIL3-ChIP-Seq(Encode)/Homer	VTTACGTAAYNNNNN	1e-3633	-8.367e+03	0.0000	7547.0	36.57%	1738.2	6.12%
+        CEBP:CEBP(bZIP)/MEF-Chop-ChIP-Seq(GSE35681)/Homer	NTNATGCAAYMNNHTGMAAY	1e-2375	-5.470e+03	0.0000	3609.0	17.49%	478.6	1.68%
+        Atf1(bZIP)/K562-ATF1-ChIP-Seq(GSE31477)/Homer	GATGACGTCA	1e-1489	-3.429e+03	0.0000	4864.0	23.57%	1690.3	5.95%
+        Fos(bZIP)/TSC-Fos-ChIP-Seq(GSE110950)/Homer	NDATGASTCAYN	1e-1301	-2.998e+03	0.0000	4465.0	21.63%	1605.2	5.65%
+        Atf3(bZIP)/GBM-ATF3-ChIP-Seq(GSE33912)/Homer	DATGASTCATHN	1e-1277	-2.942e+03	0.0000	4754.0	23.03%	1840.2	6.48%
+        JunB(bZIP)/DendriticCells-Junb-ChIP-Seq(GSE36099)/Homer	RATGASTCAT	1e-1265	-2.914e+03	0.0000	4280.0	20.74%	1514.9	5.33%
+8. ATF4_ISR
+        Motif Name	Consensus	P-value	Log P-value	q-value (Benjamini)	# of Target Sequences with Motif(of 525)	% of Target Sequences with Motif	# of Background Sequences with Motif(of 45172)	% of Background Sequences with Motif
+        ABF1/SacCer-Promoters/Homer	CGTRNAAARTGA	1e-114	-2.626e+02	0.0000	126.0	24.00%	605.3	1.34%
+        GT3a(Trihelix)/col-GT3a-DAP-Seq(GSE60143)/Homer	WNACACGTGTYWWAW	1e-72	-1.660e+02	0.0000	106.0	20.19%	868.3	1.92%
+        NFAT:AP1(RHD,bZIP)/Jurkat-NFATC1-ChIP-Seq(Jolma_et_al.)/Homer	SARTGGAAAAWRTGAGTCAB	1e-51	-1.175e+02	0.0000	84.0	16.00%	814.3	1.80%
+        NFAT(RHD)/Jurkat-NFATC1-ChIP-Seq(Jolma_et_al.)/Homer	ATTTTCCATT	1e-45	-1.045e+02	0.0000	201.0	38.29%	6044.9	13.39%
+        Chop(bZIP)/MEF-Chop-ChIP-Seq(GSE35681)/Homer	ATTGCATCAT	1e-45	-1.044e+02	0.0000	84.0	16.00%	969.1	2.15%
+        AARE(HLH)/mES-cMyc-ChIP-Seq/Homer	GATTGCATCA	1e-43	-9.994e+01	0.0000	56.0	10.67%	353.7	0.78%
+        PRDM15(Zf)/ESC-Prdm15-ChIP-Seq(GSE73694)/Homer	YCCDNTCCAGGTTTT	1e-43	-9.918e+01	0.0000	170.0	32.38%	4589.2	10.16%
+        DEL2(E2FDP)/col-DEL2-DAP-Seq(GSE60143)/Homer	WTTTCSCGCC	1e-41	-9.546e+01	0.0000	76.0	14.48%	860.4	1.91%
+        At3g04030(G2like)/col-At3g04030-DAP-Seq(GSE60143)/Homer	DRGAATCT	1e-40	-9.422e+01	0.0000	198.0	37.71%	6301.5	13.95%
+        Atf4(bZIP)/MEF-Atf4-ChIP-Seq(GSE35681)/Homer	MTGATGCAAT	1e-40	-9.411e+01	0.0000	86.0	16.38%	1176.3	2.60%
+9. gps2_withFCCP
+        Motif Name	Consensus	P-value	Log P-value	q-value (Benjamini)	# of Target Sequences with Motif(of 2624)	% of Target Sequences with Motif	# of Background Sequences with Motif(of 43207)	% of Background Sequences with Motif
+        CELF2(RRM)/JSL1-CELF2-CLIP-Seq(GSE71264)/Homer	RGTGTCAG	1e-24	-5.552e+01	0.0000	275.0	10.48%	2337.5	5.41%
+        ATHB25(ZFHD)/colamp-ATHB25-DAP-Seq(GSE60143)/Homer	TAATTAVB	1e-22	-5.217e+01	0.0000	326.0	12.43%	3021.8	6.99%
+        Pit1(Homeobox)/GCrat-Pit1-ChIP-Seq(GSE58009)/Homer	ATGMATATDC	1e-21	-5.062e+01	0.0000	453.0	17.27%	4707.7	10.90%
+        En1(Homeobox)/SUM149-EN1-ChIP-Seq(GSE120957)/Homer	NDCTAATTAS	1e-18	-4.357e+01	0.0000	534.0	20.36%	6014.2	13.92%
+        DLX1(Homeobox)/BasalGanglia-Dlx1-ChIP-seq(GSE124936)/Homer	NSNNTAATTA	1e-16	-3.785e+01	0.0000	383.0	14.60%	4096.3	9.48%
+        At3g09600(MYBrelated)/colamp-At3g09600-DAP-Seq(GSE60143)/Homer	AAAATATCTT	1e-14	-3.411e+01	0.0000	132.0	5.03%	1012.8	2.34%
+        DLX2(Homeobox)/BasalGanglia-Dlx2-ChIP-seq(GSE124936)/Homer	NNNTAATTAS	1e-12	-2.800e+01	0.0000	400.0	15.25%	4631.6	10.72%
+        AGL63(MADS)/col-AGL63-DAP-Seq(GSE60143)/Homer	TTCCAAWWWTGG	1e-11	-2.676e+01	0.0000	207.0	7.89%	2052.7	4.75%
+        Meis1(Homeobox)/MastCells-Meis1-ChIP-Seq(GSE48085)/Homer	VGCTGWCAVB	1e-11	-2.553e+01	0.0000	757.0	28.86%	10003.9	23.15%
+        Pit1+1bp(Homeobox)/GCrat-Pit1-ChIP-Seq(GSE58009)/Homer	ATGCATAATTCA	1e-9	-2.144e+01	0.0000	78.0	2.97%	589.2	1.36%

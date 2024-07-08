@@ -1,7 +1,17 @@
-﻿SRR,FTP Link,Title,File name
-SRX1738263,ftp.sra.ebi.ac.uk/vol1/fastq/SRR347/007/SRR3470727/SRR3470727.fastq.gz,ChIP-seq in siCTL,chip_sictl
-SRX1738264,ftp.sra.ebi.ac.uk/vol1/fastq/SRR347/008/SRR3470728/SRR3470728.fastq.gz,ChIP-seq in siGPS2,chip_sigps2
-SRX3581800,ftp.sra.ebi.ac.uk/vol1/fastq/SRR649/002/SRR6492252/SRR6492252.fastq.gz,GPS2 ChIP-seq in plus (with) FCCP treatment of 3T3-L1 cells,gps2_FCCP+_rep1
-SRX3581800,ftp.sra.ebi.ac.uk/vol1/fastq/SRR649/003/SRR6492253/SRR6492253.fastq.gz,GPS2 ChIP-seq in plus (with) FCCP treatment of 3T3-L1 cells,gps2_FCCP+_rep2
-SRX3581798,ftp.sra.ebi.ac.uk/vol1/fastq/SRR649/000/SRR6492250/SRR6492250.fastq.gz,GPS2 ChIP-seq in minus (no) FCCP treatment of 3T3-L1 cells,gps2_FCCP-_rep1
-SRX3581798,ftp.sra.ebi.ac.uk/vol1/fastq/SRR649/001/SRR6492251/SRR6492251.fastq.gz,GPS2 ChIP-seq in minus (no) FCCP treatment of 3T3-L1 cells,gps2_FCCP-_rep2
+﻿SRR,FTP Link,Title,File name,Target Directory
+SRX1738263,ftp.sra.ebi.ac.uk/vol1/fastq/SRR347/007/SRR3470727/SRR3470727.fastq.gz,ChIP-seq in siCTL,chip_sigps2,WT/GPS2
+SRX1738264,ftp.sra.ebi.ac.uk/vol1/fastq/SRR347/008/SRR3470728/SRR3470728.fastq.gz,ChIP-seq in siGPS2,chip_sictl,WT/GPS2
+SRX3581800,ftp.sra.ebi.ac.uk/vol1/fastq/SRR649/002/SRR6492252/SRR6492252.fastq.gz,GPS2 ChIP-seq in plus (with) FCCP treatment of 3T3-L1 cells,gps2_withFCCP_rep1,Treatment/GPS2
+SRX3581800,ftp.sra.ebi.ac.uk/vol1/fastq/SRR649/003/SRR6492253/SRR6492253.fastq.gz,GPS2 ChIP-seq in plus (with) FCCP treatment of 3T3-L1 cells,gps2_withFCCP_rep2,Treatment/GPS2
+SRX3581798,ftp.sra.ebi.ac.uk/vol1/fastq/SRR649/000/SRR6492250/SRR6492250.fastq.gz,GPS2 ChIP-seq in minus (no) FCCP treatment of 3T3-L1 cells,gps2_noFCCP_rep1,Treatment/GPS2
+SRX3581798,ftp.sra.ebi.ac.uk/vol1/fastq/SRR649/001/SRR6492251/SRR6492251.fastq.gz,GPS2 ChIP-seq in minus (no) FCCP treatment of 3T3-L1 cells,gps2_noFCCP_rep2,Treatment/GPS2
+SRR1291259,ftp.sra.ebi.ac.uk/vol1/fastq/SRR129/009/SRR1291259/SRR1291259.fastq.gz,GPS2_day6,gps2_day6,Differentiation/GPS2
+SRR1291258,ftp.sra.ebi.ac.uk/vol1/fastq/SRR129/008/SRR1291258/SRR1291258.fastq.gz,GPS2_day0,gps2_day0,Differentiation/GPS2
+SRR2924607,ftp.sra.ebi.ac.uk/vol1/fastq/SRR292/007/SRR2924607/SRR2924607.fastq.gz,AAD_ATF4,ATF4_ISR,Treatment/ATF4
+SRR407511,ftp.sra.ebi.ac.uk/vol1/fastq/SRR407/SRR407511/SRR407511.fastq.gz,Atf4+/+ Tm ChIP-seq,ATF4_WT_rep1,Treatment/ATF4
+SRR407512,ftp.sra.ebi.ac.uk/vol1/fastq/SRR407/SRR407512/SRR407512.fastq.gz,Atf4+/+ Tm ChIP-seq,ATF4_WT_rep2,Treatment/ATF4
+SRR407513,ftp.sra.ebi.ac.uk/vol1/fastq/SRR407/SRR407513/SRR407513.fastq.gz,Atf4+/+ Tm ChIP-seq,ATF4_WT_rep3,Treatment/ATF4
+SRR407514,ftp.sra.ebi.ac.uk/vol1/fastq/SRR407/SRR407514/SRR407514.fastq.gz,Atf4-/ Tm ChIP-seq,ATF4_KO_rep1,Treatment/ATF4
+SRR407515,ftp.sra.ebi.ac.uk/vol1/fastq/SRR407/SRR407515/SRR407515.fastq.gz,Atf4-/ Tm ChIP-seq,ATF4_KO_rep2,Treatment/ATF4
+SRR407516,ftp.sra.ebi.ac.uk/vol1/fastq/SRR407/SRR407516/SRR407516.fastq.gz,Atf4-/ Tm ChIP-seq,ATF4_KO_rep3,Treatment/ATF4
+SRR2025080,ftp.sra.ebi.ac.uk/vol1/fastq/SRR202/000/SRR2025080/SRR2025080.fastq.gz,ATF4_HighDensity_noDMI,ATF_noDMI,Differentiation/ATF4

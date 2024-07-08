@@ -1,0 +1,498 @@
+import pandas as pd
+import os
+
+sample_csv = pd.read_csv('Sample_Data.csv')
+updated_samples_sheet = pd.read_csv('Updated_Sample_Sheet.csv')
+REP = ['rep1', 'rep2']
+REPEATS = ['rep1', 'rep2', 'rep3']
+EXTENSIONS = [1, 2, 3, 4, 'rev.1', 'rev.2']
+DIRECTORY = ['WT', 'Treatment', 'Differentiation']
+
+rule all:
+    input:
+        # Downloaded files
+        expand("{orig_dir}/samples/{orig_file}.fastq.gz", 
+               zip, orig_dir=sample_csv['Target Directory'], orig_file=sample_csv['File name']),
+        # Files for downstream analysis (including concatenated)
+        expand("{dir}/samples/{file}.fastq.gz", 
+               zip, dir=updated_samples_sheet['Directory'], file=updated_samples_sheet['Name']),
+        # Analysis outputs
+        expand("{dir}/results/fastqc/{file}_fastqc.html", 
+               zip, dir=updated_samples_sheet['Directory'], file=updated_samples_sheet['Name']),
+        expand("{dir}/results/trimqc/{file}.trim_fastqc.html",
+               zip, dir=updated_samples_sheet['Directory'], file=updated_samples_sheet['Name']),
+        expand("{dir}/results/flagstat/{file}.txt",
+               zip, dir=updated_samples_sheet['Directory'], file=updated_samples_sheet['Name']),
+        expand("{dir}/results/bigwig/{file}.bw",
+               zip, dir=updated_samples_sheet['Directory'], file=updated_samples_sheet['Name']),
+        # expand("{directory}/multiqc/multiqc_report.html", directory=DIRECTORY),
+        'Treatment/GPS2/results/annotation/gps2_withFCCP_annotated.txt',
+        'Treatment/ATF4/results/annotation/ATF4_WT_annotated.txt',
+        'WT/GPS2/results/annotation/chip_sictl_NC_annotated.txt',
+        'WT/GPS2/results/annotation/chip_sigps2_NC_annotated.txt',
+        'WT/GPS2/results/annotation/chip_sictl_annotated.txt',
+        'Differentiation/GPS2/results/annotation/gps2_day0_annotated.txt',
+        'Differentiation/GPS2/results/annotation/gps2_day6_annotated.txt',
+        directory('Treatment/GPS2/results/motifs'),
+        directory('Treatment/ATF4/results/motifs'),
+        directory('WT/GPS2/results/motifs/siCTL'),
+        directory('WT/GPS2/results/motifs/siGPS2'),
+        directory('WT/GPS2/results/motifs/siCTLvssiGPS2'),
+        directory('Differentiation/GPS2/results/motifs/day0'),
+        directory('Differentiation/GPS2/results/motifs/day6'),
+        directory('Treatment/ATF4/results/motifs/ATF4_ISR'),
+        expand("{dir}/results/{file}_Plotprofile.png",
+            zip, dir=updated_samples_sheet['Directory'], file=updated_samples_sheet['Name'])
+
+rule wget_files:
+    output:
+        '{orig_dir}/samples/{orig_file}.fastq.gz'
+    params:
+        link = lambda wildcards: sample_csv.loc[
+            (sample_csv['Target Directory'] == wildcards.orig_dir) & 
+            (sample_csv['File name'] == wildcards.orig_file), 'FTP Link'
+        ].iloc[0]
+    threads: 8
+    shell:
+        'wget -O {output} {params.link}'
+
+rule download_gtf:
+    output:
+        'samples/GRCm39_annotation.fa'
+    params:
+        fa = 'samples/GRCm39_annotation.fa.gz'
+    shell:
+        '''
+        wget -O {params.fa} https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M35/GRCm39.primary_assembly.genome.fa.gz
+        gunzip {params.fa}
+        '''
+
+rule concatenate_fastq:
+    input:
+        ATF4_WT = expand('Treatment/ATF4/samples/ATF4_WT_{rep}.fastq.gz', rep = REPEATS),
+        ATF4_KO = expand('Treatment/ATF4/samples/ATF4_KO_{rep}.fastq.gz', rep = REPEATS)
+    output:
+        ATF4_WT = 'Treatment/ATF4/samples/ATF4_WT.fastq.gz',
+        ATF4_KO = 'Treatment/ATF4/samples/ATF4_KO.fastq.gz'
+    shell:
+        '''
+        cat {input.ATF4_WT} > {output.ATF4_WT}
+        cat {input.ATF4_KO} > {output.ATF4_KO}
+        '''
+
+rule fastqc:
+    input: 
+        lambda wildcards: f"{wildcards.dir}/samples/{wildcards.file}.fastq.gz"
+    output:
+        html = '{dir}/results/fastqc/{file}_fastqc.html',
+        zip = '{dir}/results/fastqc/{file}_fastqc.zip'
+    params:
+        outdir = lambda wildcards, output: os.path.dirname(output.html)
+    threads: 8
+    conda:
+        'envs/fastqc_env.yml'
+    shell:
+        '''
+        mkdir -p {params.outdir}
+        fastqc {input} -o {params.outdir}
+        '''
+
+rule trimomatic:
+    input:
+        fastq = '{dir}/samples/{file}.fastq.gz'
+    output:
+        trimmed = '{dir}/results/trimmed/{file}.trim.fastq.gz'
+    params:
+        ad = 'samples/TruSeq3-SE.fa',
+        outdir = lambda wildcards, output: os.path.dirname(output.trimmed)
+    threads: 8
+    conda:
+        'envs/trimmomatic_env.yml'
+    shell:
+        '''
+        wget -O {params.ad} https://github.com/usadellab/Trimmomatic/raw/main/adapters/TruSeq3-SE.fa
+        mkdir -p {params.outdir}
+        trimmomatic SE -threads {threads} -phred33 {input.fastq} {output.trimmed} ILLUMINACLIP:{params.ad}:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+        '''
+
+rule bowtie2_build_gencode:
+    input:
+        fa = 'samples/GRCm39_annotation.fa'
+    output:
+        expand('results/GRCm39.{ext}.bt2', ext=EXTENSIONS)
+    params:
+        outdir = 'results/GRCm39'
+    threads: 16
+    conda:
+        'envs/bowtie2_env.yml'
+    shell:
+        '''
+        bowtie2-build {input.fa} {params.outdir}
+        '''
+
+rule unzip_fq:
+    input:
+        samples = '{dir}/results/trimmed/{file}.trim.fastq.gz'
+    output:
+        unzip = '{dir}/results/trimmed/{file}.trim.fastq'
+    threads: 8
+    shell:
+        '''
+        gunzip -c {input.samples} > {output.unzip}
+        '''
+
+rule trimqc:
+    input: 
+        fastq = '{dir}/results/trimmed/{file}.trim.fastq'
+    output:
+        fastqc = '{dir}/results/trimqc/{file}.trim_fastqc.html'
+    params:
+        outdir = lambda wildcards, output: os.path.dirname(output.fastqc)
+    threads: 4
+    conda:
+        'envs/fastqc_env.yml'
+    shell:
+        '''
+        mkdir -p {params.outdir}
+        fastqc {input.fastq} -o {params.outdir}
+        '''
+
+rule bowtie2_align:
+    input:
+        samples = '{dir}/results/trimmed/{file}.trim.fastq',
+        bt2 = expand('results/GRCm39.{ext}.bt2', ext=EXTENSIONS)
+    output:
+        bam = '{dir}/results/aligned/{file}.bam'
+    threads: 16
+    params:
+        index = 'results/GRCm39',
+        outdir = lambda wildcards, output: os.path.dirname(output.bam)
+    conda:
+        'envs/bowtie2_env.yml'
+    shell:
+        '''
+        mkdir -p {params.outdir}
+        bowtie2 -x {params.index} -U {input.samples} | samtools view -bS - > {output.bam}
+        '''
+
+rule samtools_sort:
+    input:
+        bam = '{dir}/results/aligned/{file}.bam'
+    output:
+        sorted = '{dir}/results/sorted/{file}.sorted.bam'
+    params:
+        outdir = lambda wildcards, output: os.path.dirname(output.sorted)
+    conda:
+        'envs/samtools_env.yml'
+    threads: 8
+    shell:
+        '''
+        mkdir -p {params.outdir}
+        samtools sort -o {output.sorted} {input.bam} 
+        '''
+
+rule samtools_idxstats:
+    input:
+        sorted = '{dir}/results/sorted/{file}.sorted.bam'
+    output:
+        index = '{dir}/results/view/{file}.txt'
+    params:
+        outdir = lambda wildcards, output: os.path.dirname(output.index)
+    conda:
+        'envs/samtools_env.yml'
+    threads: 8
+    shell:
+        '''
+        mkdir -p {params.outdir}
+        samtools idxstats {input.sorted} > {output.index}
+        '''
+
+rule samtools_idx:
+    input:
+        filter = '{dir}/results/sorted/{file}.sorted.bam'
+    output:
+        index = '{dir}/results/sorted/{file}.sorted.bam.bai'
+    conda:
+        'envs/samtools_env.yml'
+    threads: 8
+    shell:
+        '''
+        samtools index {input.filter} {output.index}
+        '''
+
+rule samtools_flagstats:
+    input:
+        filter = '{dir}/results/sorted/{file}.sorted.bam'
+    output:
+        flagstat = '{dir}/results/flagstat/{file}.txt'
+    params:
+        outdir = lambda wildcards, output: os.path.dirname(output.flagstat)
+    conda:
+        'envs/samtools_env.yml'
+    threads: 8
+    shell:
+        '''
+        mkdir -p {params.outdir}
+        samtools flagstat {input.filter} > {output.flagstat}
+        '''
+
+rule multiqc:
+    input:
+        expand("{dir}/results/flagstat/{file}.txt",
+               zip, dir=updated_samples_sheet['Directory'], file=updated_samples_sheet['Name'])
+    output:
+        multiqc = expand("{directory}/multiqc/multiqc_report.html", directory=DIRECTORY)
+    params:
+        dirs = DIRECTORY
+    conda:
+        "envs/multiqc_env.yml"
+    shell:
+        """
+        for dir in {params.dirs}; do 
+            multiqc ${{dir}} -o ${{dir}}/multiqc
+        done
+        """
+
+rule bamCoverage:
+    input:
+        bam = '{dir}/results/sorted/{file}.sorted.bam',
+        bai = '{dir}/results/sorted/{file}.sorted.bam.bai',
+        blacklist = 'samples/mm39_all_genes.bed'
+    output:
+        bigwig = '{dir}/results/bigwig/{file}.bw'
+    threads: 28
+    conda:
+        'envs/deeptools_env.yml'
+    log:
+        '{dir}/logs/{file}_bamCoverage.log'
+    shell:
+        '''
+        echo "Starting bamCoverage for {input.bam} at $(date)" >> {log}
+        bamCoverage -b {input.bam} -o {output.bigwig} -bl {input.blacklist} --effectiveGenomeSize 2652783500 -p {threads} --verbose >> {log} 2>&1
+        echo "Finished bamCoverage for {input.bam} at $(date)" >> {log}
+        '''
+
+rule callpeak_diff:
+    input:
+        day0 = 'Differentiation/GPS2/results/sorted/gps2_day0.sorted.bam',
+        day6 = 'Differentiation/GPS2/results/sorted/gps2_day6.sorted.bam'
+    output:
+        day0 = 'Differentiation/GPS2/results/macs3/gps2_day0_peaks.narrowPeak',
+        day6 = 'Differentiation/GPS2/results/macs3/gps2_day6_peaks.narrowPeak'
+    params:
+        day0 = lambda wildcards, output: os.path.dirname(output.day0),
+        day6 = lambda wildcards, output: os.path.dirname(output.day6)
+    conda:
+        'envs/macs3_env.yml'
+    threads: 16
+    shell:
+        '''
+        macs3 callpeak -t {input.day0} -f BAM -g 2654621783 -n gps2_day0 --nolambda -B -q 0.05 --outdir {params.day0}
+        macs3 callpeak -t {input.day6} -f BAM -g 2654621783 -n gps2_day6 --nolambda -B -q 0.05 --outdir {params.day6}
+        '''
+
+rule callpeak_WT:
+    input:
+        siCTL = 'WT/GPS2/results/sorted/chip_sictl.sorted.bam',
+        siGPS2 = 'WT/GPS2/results/sorted/chip_sigps2.sorted.bam'
+    output:
+        siCTL = 'WT/GPS2/results/macs3/chip_sictl_NC_peaks.narrowPeak',
+        siGPS2 = 'WT/GPS2/results/macs3/chip_sigps2_NC_peaks.narrowPeak',
+        siCTLvsGPS2 = 'WT/GPS2/results/macs3/chip_sictl_peaks.narrowPeak'
+    params:
+        macs = lambda wildcards, output: os.path.dirname(output.siCTL)
+    threads: 16
+    conda:
+        'envs/macs3_env.yml'
+    shell:
+        '''
+        macs3 callpeak -t {input.siCTL} -f BAM -g 2654621783 -n chip_sictl_NC --nolambda -B -q 0.05 --outdir {params.macs}
+        macs3 callpeak -t {input.siGPS2} -f BAM -g 2654621783 -n chip_sigps2_NC --nolambda -B -q 0.05 --outdir {params.macs}
+        macs3 callpeak -t {input.siCTL} -c {input.siGPS2} -f BAM -g 2654621783 -n chip_sictl -B -q 0.05 --outdir {params.macs}
+        '''
+
+rule callpeak_FCCP:
+    input:
+        GPS2with = expand('Treatment/GPS2/results/sorted/gps2_withFCCP_{rep}.sorted.bam', rep=REP),
+        GPS2ko = expand('Treatment/GPS2/results/sorted/gps2_noFCCP_{rep}.sorted.bam', rep=REP),
+        ATF4with = 'Treatment/ATF4/results/sorted/ATF4_WT.sorted.bam',
+        ATF4ko = 'Treatment/ATF4/results/sorted/ATF4_KO.sorted.bam',
+        ATF4isr = 'Treatment/ATF4/results/sorted/ATF4_ISR.sorted.bam'
+    output:
+        GPS2 = 'Treatment/GPS2/results/macs3/gps2_withFCCP_peaks.narrowPeak',
+        ATF4 = 'Treatment/ATF4/results/macs3/ATF4_WT_peaks.narrowPeak',
+        ATF4isr = 'Treatment/ATF4/results/macs3/ATF4_ISR_peaks.narrowPeak'
+    params:
+        GPS2 = lambda wildcards, output: os.path.dirname(output.GPS2),
+        ATF4 = lambda wildcards, output: os.path.dirname(output.ATF4),
+        ATF4isr = lambda wildcards, output: os.path.dirname(output.ATF4isr)
+    threads: 16
+    conda:
+        'envs/macs3_env.yml'
+    shell:
+        '''
+        macs3 callpeak -t {input.GPS2with} -c {input.GPS2ko} -f BAM -g 2654621783 -n gps2_withFCCP -B -q 0.05 --outdir {params.GPS2}
+        macs3 callpeak -t {input.ATF4with} -c {input.ATF4ko} -f BAM -g 2654621783 -n ATF4_WT -B -q 0.05 --outdir {params.ATF4}
+        macs3 callpeak -t {input.ATF4isr} -f BAM -g 2654621783 -n ATF4_ISR -B -q 0.05 --outdir {params.ATF4isr}
+        '''
+
+rule filter_blacklist:
+    input:
+        GPS2 = 'Treatment/GPS2/results/macs3/gps2_withFCCP_peaks.narrowPeak',
+        ATF4 = 'Treatment/ATF4/results/macs3/ATF4_WT_peaks.narrowPeak',
+        siCTL = 'WT/GPS2/results/macs3/chip_sictl_NC_peaks.narrowPeak',
+        siGPS2 = 'WT/GPS2/results/macs3/chip_sigps2_NC_peaks.narrowPeak',
+        siCTLvsGPS2 = 'WT/GPS2/results/macs3/chip_sictl_peaks.narrowPeak',
+        day0 = 'Differentiation/GPS2/results/macs3/gps2_day0_peaks.narrowPeak',
+        day6 = 'Differentiation/GPS2/results/macs3/gps2_day6_peaks.narrowPeak',
+        ATF4isr = 'Treatment/ATF4/results/macs3/ATF4_ISR_peaks.narrowPeak',
+        blacklist = 'samples/mm39.excluderanges.bed'
+    output:
+        GPS2 = 'Treatment/GPS2/results/filtered/gps2_withFCCP_bf.narrowPeak',
+        ATF4 = 'Treatment/ATF4/results/filtered/ATF4_WT_bf.narrowPeak',
+        siCTL = 'WT/GPS2/results/filtered/chip_sictl_NC_bf.narrowPeak',
+        siGPS2 = 'WT/GPS2/results/filtered/chip_sigps2_NC_bf.narrowPeak',
+        siCTLvsGPS2 = 'WT/GPS2/results/filtered/chip_sictl_bf.narrowPeak',
+        day0 = 'Differentiation/GPS2/results/filtered/gps2_day0_bf.narrowPeak',
+        day6 = 'Differentiation/GPS2/results/filtered/gps2_day6_bf.narrowPeak',
+        ATF4isr = 'Treatment/ATF4/results/filtered/ATF4_ISR_bf.narrowPeak'
+    conda:
+        'envs/bedtools_env.yml'
+    shell:
+        '''
+        bedtools intersect -v -a {input.GPS2} -b {input.blacklist} > {output.GPS2}
+        bedtools intersect -v -a {input.ATF4} -b {input.blacklist} > {output.ATF4}
+        bedtools intersect -v -a {input.siCTL} -b {input.blacklist} > {output.siCTL}
+        bedtools intersect -v -a {input.siGPS2} -b {input.blacklist} > {output.siGPS2}
+        bedtools intersect -v -a {input.day0} -b {input.blacklist} > {output.day0}
+        bedtools intersect -v -a {input.day6} -b {input.blacklist} > {output.day6}
+        bedtools intersect -v -a {input.ATF4isr} -b {input.blacklist} > {output.ATF4isr}
+        bedtools intersect -v -a {input.siCTLvsGPS2} -b {input.blacklist} > {output.siCTLvsGPS2}
+        '''
+
+rule unzip_gtf:
+    output:
+        'results/gencode.v45.primary_assembly.annotation.gtf'
+    params:
+        gtf = 'results/gencode.v45.primary_assembly.annotation.gtf.gz'
+    shell:
+        '''
+        wget -O {params.gtf} https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M35/gencode.vM35.basic.annotation.gtf.gz
+        gunzip {params.gtf}
+        '''
+
+rule annotate_peaks:
+    input:
+        GPS2 = 'Treatment/GPS2/results/filtered/gps2_withFCCP_bf.narrowPeak',
+        ATF4 = 'Treatment/ATF4/results/filtered/ATF4_WT_bf.narrowPeak',
+        siCTL = 'WT/GPS2/results/filtered/chip_sictl_NC_bf.narrowPeak',
+        siGPS2 = 'WT/GPS2/results/filtered/chip_sigps2_NC_bf.narrowPeak',
+        siCTLvsGPS2 = 'WT/GPS2/results/filtered/chip_sictl_bf.narrowPeak',
+        day0 = 'Differentiation/GPS2/results/filtered/gps2_day0_bf.narrowPeak',
+        day6 = 'Differentiation/GPS2/results/filtered/gps2_day6_bf.narrowPeak',
+        gtf = 'results/gencode.v45.primary_assembly.annotation.gtf'
+    output:
+        GPS2 = 'Treatment/GPS2/results/annotation/gps2_withFCCP_annotated.txt',
+        ATF4 = 'Treatment/ATF4/results/annotation/ATF4_WT_annotated.txt',
+        siCTL = 'WT/GPS2/results/annotation/chip_sictl_NC_annotated.txt',
+        siGPS2 = 'WT/GPS2/results/annotation/chip_sigps2_NC_annotated.txt',
+        siCTLvsGPS2 = 'WT/GPS2/results/annotation/chip_sictl_annotated.txt',
+        day0 = 'Differentiation/GPS2/results/annotation/gps2_day0_annotated.txt',
+        day6 = 'Differentiation/GPS2/results/annotation/gps2_day6_annotated.txt'
+    conda:
+        'envs/homer_env.yml'
+    shell:
+        '''
+        annotatePeaks.pl {input.GPS2} mm39 -gtf {input.gtf}  > {output.GPS2}
+        annotatePeaks.pl {input.ATF4} mm39 -gtf {input.gtf}  > {output.ATF4}
+        annotatePeaks.pl {input.siCTL} mm39 -gtf {input.gtf}  > {output.siCTL}
+        annotatePeaks.pl {input.siGPS2} mm39 -gtf {input.gtf}  > {output.siGPS2}
+        annotatePeaks.pl {input.day0} mm39 -gtf {input.gtf}  > {output.day0}
+        annotatePeaks.pl {input.day6} mm39 -gtf {input.gtf}  > {output.day6}
+        annotatePeaks.pl {input.siCTLvsGPS2} mm39 -gtf {input.gtf}  > {output.siCTLvsGPS2}
+        '''
+
+rule motifs_Treatment:
+    input:
+        GPS2 = 'Treatment/GPS2/results/filtered/gps2_withFCCP_bf.narrowPeak',
+        ATF4 = 'Treatment/ATF4/results/filtered/ATF4_WT_bf.narrowPeak',
+        ATF4isr = 'Treatment/ATF4/results/filtered/ATF4_ISR_bf.narrowPeak',
+        fasta = 'samples/GRCm39_annotation.fa'
+    output:
+        GPS2 = directory('Treatment/GPS2/results/motifs'),
+        ATF4 = directory('Treatment/ATF4/results/motifs'),
+        ATF4isr = directory('Treatment/ATF4/results/motifs/ATF4_ISR')
+    conda:
+        'envs/homer_env.yml'
+    threads: 8
+    shell:
+        '''
+        findMotifsGenome.pl {input.GPS2} {input.fasta} {output.GPS2} -size 200 -p {threads}
+        findMotifsGenome.pl {input.ATF4} {input.fasta} {output.ATF4} -size 200 -p {threads}
+        findMotifsGenome.pl {input.ATF4isr} {input.fasta} {output.ATF4isr} -size 200 -p {threads}
+        '''
+
+rule motifs_WT:
+    input:
+        siCTL = 'WT/GPS2/results/filtered/chip_sictl_NC_bf.narrowPeak',
+        siGPS2 = 'WT/GPS2/results/filtered/chip_sigps2_NC_bf.narrowPeak',
+        siCTLvsGPS2 = 'WT/GPS2/results/filtered/chip_sictl_bf.narrowPeak',
+        fasta = 'samples/GRCm39_annotation.fa'
+    output:
+        siCTL = directory('WT/GPS2/results/motifs/siCTL'),
+        siGPS2 = directory('WT/GPS2/results/motifs/siGPS2'),
+        siCTLvsGPS2 = directory('WT/GPS2/results/motifs/siCTLvssiGPS2'),
+    conda:
+        'envs/homer_env.yml'
+    threads: 8
+    shell:
+        '''
+        findMotifsGenome.pl {input.siCTL} {input.fasta} {output.siCTL} -size 200 -p {threads}
+        findMotifsGenome.pl {input.siGPS2} {input.fasta} {output.siGPS2} -size 200 -p {threads}
+        findMotifsGenome.pl {input.siCTLvsGPS2} {input.fasta} {output.siCTLvsGPS2} -size 200 -p {threads}
+        '''
+
+rule motifs_Differentiation:
+    input:
+        day0 = 'Differentiation/GPS2/results/filtered/gps2_day0_bf.narrowPeak',
+        day6 = 'Differentiation/GPS2/results/filtered/gps2_day6_bf.narrowPeak',
+        fasta = 'samples/GRCm39_annotation.fa'
+    output:
+        day0 = directory('Differentiation/GPS2/results/motifs/day0'),
+        day6 = directory('Differentiation/GPS2/results/motifs/day6'),
+    conda:
+        'envs/homer_env.yml'
+    threads: 8
+    shell:
+        '''
+        findMotifsGenome.pl {input.day0} {input.fasta} {output.day0} -size 200 -p {threads}
+        findMotifsGenome.pl {input.day6} {input.fasta} {output.day6} -size 200 -p {threads}
+        '''
+
+rule computeMatrix:
+    input:
+        bigwig = '{dir}/results/bigwig/{file}.bw',
+        bed = 'samples/mm39_all_genes.bed'
+    output:
+        '{dir}/results/bigwig/{file}_matrix.gz'
+    params:
+        window = 2000
+    conda:
+        'envs/deeptools_env.yml'
+    threads: 16
+    shell:
+        '''
+        computeMatrix scale-regions -S {input.bigwig} -R {input.bed} -a {params.window} -b {params.window} --outFileName {output}
+        '''
+
+rule plotMatrix:
+    input:
+        '{dir}/results/bigwig/{file}_matrix.gz'
+    output:
+        '{dir}/results/{file}_Plotprofile.png'
+    conda:
+        'envs/deeptools_env.yml'
+    shell:
+        '''
+        plotProfile -m {input} -o {output}
+        '''

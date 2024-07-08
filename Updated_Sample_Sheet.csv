@@ -1,0 +1,12 @@
+Name,Directory
+chip_sigps2,WT/GPS2
+chip_sictl,WT/GPS2
+gps2_withFCCP_rep1,Treatment/GPS2
+gps2_withFCCP_rep2,Treatment/GPS2
+gps2_noFCCP_rep1,Treatment/GPS2
+gps2_noFCCP_rep2,Treatment/GPS2
+gps2_day6,Differentiation/GPS2
+gps2_day0,Differentiation/GPS2
+ATF4_ISR,Treatment/ATF4
+ATF4_WT,Treatment/ATF4
+ATF4_KO,Treatment/ATF4
