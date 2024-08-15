@@ -70,6 +70,17 @@ Wild Type
 
 Differentiation:
 4. ATF4_noDMI (Human)
+        Othe intron: 31.16%
+        Distal Intergenic: 28.01%
+        Promoter (<= 1kb): 14.11%
+        Promoter (1-2kb): 4.67%
+        Promoter (2-3kb): 3.89%
+        Other Exon: 2%
+        1st Intron: 13.81%
+        3’ UTR: 1.39%
+        1st Exon: 0.72%
+        5’ UTR: 0.17%
+        Downstream (<= 300): 0.09%
 
 5. gps2_day0
         Promoter (<= 1kb): 56.44%
@@ -97,7 +108,7 @@ Differentiation:
         Other Exon (1-300): 0.56%
 
 Treatment:
-7. ATF4_ISR
+7. ATF4_ISR (AAD)
         Distal Intergenic: 52.29%
         Other Intron: 22.02%
         Promoter (<= 1kb): 9.79%
@@ -108,7 +119,7 @@ Treatment:
         3’ UTR: 0.92%
         Other Exon: 0.61%
 
-8. ATF4_WT
+8. ATF4_WT (Tunicamycin)
         Distal Intergenic (37.64%)
         Other Intron (25.62%)
         1st Intron (12.39%)
@@ -257,3 +268,53 @@ Treatment:
         AGL63(MADS)/col-AGL63-DAP-Seq(GSE60143)/Homer	TTCCAAWWWTGG	1e-11	-2.676e+01	0.0000	207.0	7.89%	2052.7	4.75%
         Meis1(Homeobox)/MastCells-Meis1-ChIP-Seq(GSE48085)/Homer	VGCTGWCAVB	1e-11	-2.553e+01	0.0000	757.0	28.86%	10003.9	23.15%
         Pit1+1bp(Homeobox)/GCrat-Pit1-ChIP-Seq(GSE58009)/Homer	ATGCATAATTCA	1e-9	-2.144e+01	0.0000	78.0	2.97%	589.2	1.36%
+________________________________________________________________________________________________
+Overlaps
+        GPS2_day0_overlap_on_ATF4_ISR -- 387
+        GPS2_day0_overlap_on_ATF4_WT -- 266
+        GPS2_day6_overlap_on_ATF4_ISR -- 377
+        GPS2_day0_overlap_on_ATF4_WT -- 691
+        GPS2_fccp_overlap_on_ATF4_ISR -- 0
+        GPS2_fccp_overlap_on_ATF4_WT -- 10
+____________________________________________________________________________________________________________________
+##############
+#PLOT PROFILE#
+##############
+1. Differentiation: ATF4 bigwig signal over GPS2 peaks
+
+Samples in consideration: 
+ATF4 - ATF4_noDMI (Human) 
+GPS2 - gps2_day0 and gps2_day6
+
+Y-axis: ATF4 ChIP-seq signal intensity
+X-axis: Distance from TSS of GPS2 peaks, ranging from -3.0 kb to +3.0 kb.
+
+Day 0:
+There are several noticeable peaks in the ATF4 signal, suggesting potential co-localization or interaction between ATF4 and GPS2 at certain genomic regions.
+The signal is generally higher compared to day 6, with peaks reaching above 2.0 on the y-axis.
+
+Day 6:
+The overall signal intensity is lower than at day 0, with values mostly below 2.0.
+There are fewer distinct peaks, suggesting possibly reduced co-localization or interaction between ATF4 and GPS2 after 6 days of differentiation.
+
+The difference between the two panels suggests that the relationship between ATF4 and GPS2 binding sites changes during the differentiation process. ATF4 appears to have a stronger and more variable association with GPS2 peaks at day 0 compared to day 6.
+This is consistent because DMI is said to induce Differentiation stress in 3T3-L1 and human mesenchymal cells. So, noDMI = No Differentiation stress = day0 condition.
+However, we do have to consider that ATF4 sample here is derived from Humans and GPS2 sample is from Mouse. (Not sure if the comparison is entirely right)
+
+2. Treatment: ATF4 bigwig signal over GPS2 peaks
+
+Samples in consideration: 
+ATF4 - ATF4_WT {Peak called with ATF4_WT as treatment and ATF4_KO as control} (Tunicamycin), ATF4_ISR (Amino Acid deprivation) 
+GPS2 - gps2_withFCCP
+
+Y-axis: ATF4 ChIP-seq signal intensity
+X-axis: Distance from TSS of GPS2 peaks, ranging from -3.0 kb to +3.0 kb.
+
+ATF4_WT shows a much higher overall signal (around 2.5-3.0) with notable peaks and variations, especially around and after the TSS.
+ATF4_ISR shows a consistently low signal (around 1.0) with minimal variation across the entire region.
+
+The ATF4_WT condition shows a prominent peak right at the TSS, suggesting increased ATF4 binding at the start of genes in the Tunicamycin treated condition.
+There's a stark contrast when compared to the Amino acid deprived condition, both Peak intensity wise and peak spread wise.
+
+This difference in AAD condition could be due to the very low number of peaks identified??
+

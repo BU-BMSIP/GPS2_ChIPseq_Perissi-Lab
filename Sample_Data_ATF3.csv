@@ -1,0 +1,3 @@
+﻿SRR,FTP Link,Title,File name,Target Directory
+SRR19509357,ftp.sra.ebi.ac.uk/vol1/fastq/SRR195/057/SRR19509357/SRR19509357_1.fastq.gz,ATF3_R1,atf3_r1,WT/ATF3
+SRR19509357,ftp.sra.ebi.ac.uk/vol1/fastq/SRR195/057/SRR19509357/SRR19509357_2.fastq.gz,ATF3_R2,atf3_r2,WT/ATF3
