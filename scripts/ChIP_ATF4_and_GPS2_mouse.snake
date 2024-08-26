@@ -161,7 +161,7 @@ rule fastqc:
         outdir = lambda wildcards, output: os.path.dirname(output.html)
     threads: 8
     conda:
-        'envs/fastqc_env.yml'
+        '/projectnb/perissilab/Jawahar/GPS2_ChIPseq_Perissi-Lab/envs/fastqc_env.yml'
     shell:
         '''
         mkdir -p {params.outdir}
@@ -178,7 +178,7 @@ rule trimomatic:
         outdir = lambda wildcards, output: os.path.dirname(output.trimmed)
     threads: 8
     conda:
-        'envs/trimmomatic_env.yml'
+        '/projectnb/perissilab/Jawahar/GPS2_ChIPseq_Perissi-Lab/envs/trimmomatic_env.yml'
     shell:
         '''
         mkdir -p {params.outdir}
@@ -194,7 +194,7 @@ rule bowtie2_build_gencode:
         outdir = 'results/GRCm39'
     threads: 16
     conda:
-        'envs/bowtie2_env.yml'
+        '/projectnb/perissilab/Jawahar/GPS2_ChIPseq_Perissi-Lab/envs/bowtie2_env.yml'
     shell:
         '''
         bowtie2-build {input.fa} {params.outdir}
@@ -220,7 +220,7 @@ rule trimqc:
         outdir = lambda wildcards, output: os.path.dirname(output.fastqc)
     threads: 4
     conda:
-        'envs/fastqc_env.yml'
+        '/projectnb/perissilab/Jawahar/GPS2_ChIPseq_Perissi-Lab/envs/fastqc_env.yml'
     shell:
         '''
         mkdir -p {params.outdir}
@@ -238,7 +238,7 @@ rule bowtie2_align:
         index = 'results/GRCm39',
         outdir = lambda wildcards, output: os.path.dirname(output.bam)
     conda:
-        'envs/bowtie2_env.yml'
+        '/projectnb/perissilab/Jawahar/GPS2_ChIPseq_Perissi-Lab/envs/bowtie2_env.yml'
     shell:
         '''
         mkdir -p {params.outdir}
@@ -253,7 +253,7 @@ rule samtools_sort:
     params:
         outdir = lambda wildcards, output: os.path.dirname(output.sorted)
     conda:
-        'envs/samtools_env.yml'
+        '/projectnb/perissilab/Jawahar/GPS2_ChIPseq_Perissi-Lab/envs/samtools_env.yml'
     threads: 8
     shell:
         '''
@@ -269,7 +269,7 @@ rule samtools_idxstats:
     params:
         outdir = lambda wildcards, output: os.path.dirname(output.index)
     conda:
-        'envs/samtools_env.yml'
+        '/projectnb/perissilab/Jawahar/GPS2_ChIPseq_Perissi-Lab/envs/samtools_env.yml'
     threads: 8
     shell:
         '''
@@ -283,7 +283,7 @@ rule samtools_idx:
     output:
         index = '{dir}/results/sorted/{file}.sorted.bam.bai'
     conda:
-        'envs/samtools_env.yml'
+        '/projectnb/perissilab/Jawahar/GPS2_ChIPseq_Perissi-Lab/envs/samtools_env.yml'
     threads: 8
     shell:
         '''
@@ -298,7 +298,7 @@ rule samtools_flagstats:
     params:
         outdir = lambda wildcards, output: os.path.dirname(output.flagstat)
     conda:
-        'envs/samtools_env.yml'
+        '/projectnb/perissilab/Jawahar/GPS2_ChIPseq_Perissi-Lab/envs/samtools_env.yml'
     threads: 8
     shell:
         '''
@@ -315,7 +315,7 @@ rule multiqc:
     params:
         dirs = DIRECTORY
     conda:
-        "envs/multiqc_env.yml"
+        "/projectnb/perissilab/Jawahar/GPS2_ChIPseq_Perissi-Lab/envs/multiqc_env.yml"
     shell:
         """
         for dir in {params.dirs}; do 
@@ -334,7 +334,7 @@ rule bamCoverage:
         outdir = lambda wildcards, output: os.path.dirname(output.bigwig)
     threads: 8
     conda:
-        'envs/deeptools_env.yml'
+        '/projectnb/perissilab/Jawahar/GPS2_ChIPseq_Perissi-Lab/envs/deeptools_env.yml'
     shell:
         '''
         mkdir -p {params.outdir}
@@ -350,7 +350,7 @@ rule call_peaks_with_control:
     params:
         genome_size = "mm"
     conda:
-        'envs/macs3_env.yml'
+        '/projectnb/perissilab/Jawahar/GPS2_ChIPseq_Perissi-Lab/envs/macs3_env.yml'
     shell:
         """
         macs3 callpeak \
@@ -370,7 +370,7 @@ rule call_peaks_without_control:
     params:
         genome_size = "mm"
     conda:
-        'envs/macs3_env.yml'
+        '/projectnb/perissilab/Jawahar/GPS2_ChIPseq_Perissi-Lab/envs/macs3_env.yml'
     shell:
         """
         macs3 callpeak \
@@ -392,7 +392,7 @@ rule filter_blacklist:
         outdir = lambda wildcards, output: os.path.dirname(output.filtered)
     threads: 4
     conda:
-        'envs/bedtools_env.yml'
+        '/projectnb/perissilab/Jawahar/GPS2_ChIPseq_Perissi-Lab/envs/bedtools_env.yml'
     shell:
         '''
         bedtools intersect -v -a {input.peaks} -b {input.blacklist} > {output.filtered}
@@ -405,7 +405,7 @@ rule motifs:
     output:
         motifs = directory('{directory}/results/motifs/{peak_file}')
     conda:
-        'envs/homer_env.yml'
+        '/projectnb/perissilab/Jawahar/GPS2_ChIPseq_Perissi-Lab/envs/homer_env.yml'
     threads: 8
     shell:
         '''
@@ -425,7 +425,7 @@ rule computeMatrix_Differentiation:
         ATF4_AAD = 'Mito_stress_treatment/Amino_acid_deprivation/ATF4/results/matrix/ATF4_AAD_Differentiation_matrix.gz',
         ATF4_ER = 'Mito_stress_treatment/ER_stress/ATF4/results/matrix/ATF4_ER_Differentiation_matrix.gz'
     conda:
-        'envs/deeptools_env.yml'
+        '/projectnb/perissilab/Jawahar/GPS2_ChIPseq_Perissi-Lab/envs/deeptools_env.yml'
     threads: 16
     shell:
         '''
@@ -448,7 +448,7 @@ rule computeMatrix_Treatment:
         ATF4_AAD = 'Mito_stress_treatment/Amino_acid_deprivation/ATF4/results/matrix/ATF4_AAD_Treatment_matrix.gz',
         ATF4_ER = 'Mito_stress_treatment/ER_stress/ATF4/results/matrix/ATF4_ER_Treatment_matrix.gz'
     conda:
-        'envs/deeptools_env.yml'
+        '/projectnb/perissilab/Jawahar/GPS2_ChIPseq_Perissi-Lab/envs/deeptools_env.yml'
     threads: 16
     shell:
         '''
@@ -469,7 +469,7 @@ rule computeMatrix_Silencing:
         ATF4_AAD = 'Mito_stress_treatment/Amino_acid_deprivation/ATF4/results/matrix/ATF4_AAD_Silencing_matrix.gz',
         ATF4_ER = 'Mito_stress_treatment/ER_stress/ATF4/results/matrix/ATF4_ER_Silencing_matrix.gz'
     conda:
-        'envs/deeptools_env.yml'
+        '/projectnb/perissilab/Jawahar/GPS2_ChIPseq_Perissi-Lab/envs/deeptools_env.yml'
     threads: 16
     shell:
         '''
@@ -493,7 +493,7 @@ rule Plotprofile:
         treat_er = 'Mito_stress_treatment/ER_stress/ATF4/results/matrix/ATF4_ER_Treatment_plotprofile.png',
         sil_er = 'Mito_stress_treatment/ER_stress/ATF4/results/matrix/ATF4_ER_Silencing_plotprofile.png'
     conda:
-        'envs/deeptools_env.yml'
+        '/projectnb/perissilab/Jawahar/GPS2_ChIPseq_Perissi-Lab/envs/deeptools_env.yml'
     shell:
         '''
         plotProfile -m {input.diff_aad} -o {output.diff_aad} --perGroup --plotTitle "ATF4_AAD with GPS2 Differentiation"
@@ -530,7 +530,7 @@ rule computeMatrix_Treatment_over_RNAseq_GSE76771:
         aad = 'Mito_stress_treatment/Amino_acid_deprivation/ATF4/results/matrix/RNA_seq/ATF4_AAD_across_ATF4Tmc_Treatment_matrix.gz',
         er = 'Mito_stress_treatment/ER_stress/ATF4/results/matrix/RNA_seq/ATF4_ER_across_ATF4Tmc_Treatment_matrix.gz'
     conda:
-        'envs/deeptools_env.yml'
+        '/projectnb/perissilab/Jawahar/GPS2_ChIPseq_Perissi-Lab/envs/deeptools_env.yml'
     threads: 16
     shell:
         '''
@@ -561,7 +561,7 @@ rule computeMatrix_Differentiation_over_RNAseq_GSE76771:
         aad = 'Mito_stress_treatment/Amino_acid_deprivation/ATF4/results/matrix/RNA_seq/ATF4_AAD_across_ATF4Tmc_Differentiation_matrix.gz',
         er = 'Mito_stress_treatment/ER_stress/ATF4/results/matrix/RNA_seq/ATF4_ER_across_ATF4Tmc_Differentiation_matrix.gz'
     conda:
-        'envs/deeptools_env.yml'
+        '/projectnb/perissilab/Jawahar/GPS2_ChIPseq_Perissi-Lab/envs/deeptools_env.yml'
     threads: 16
     shell:
         '''
@@ -592,7 +592,7 @@ rule computeMatrix_Silencing_over_RNAseq_GSE76771:
         aad = 'Mito_stress_treatment/Amino_acid_deprivation/ATF4/results/matrix/RNA_seq/ATF4_AAD_across_ATF4Tmc_Silencing_matrix.gz',
         er = 'Mito_stress_treatment/ER_stress/ATF4/results/matrix/RNA_seq/ATF4_ER_across_ATF4Tmc_Silencing_matrix.gz'
     conda:
-        'envs/deeptools_env.yml'
+        '/projectnb/perissilab/Jawahar/GPS2_ChIPseq_Perissi-Lab/envs/deeptools_env.yml'
     threads: 16
     shell:
         '''
@@ -616,7 +616,7 @@ rule Plotprofile_RNAseq_GSE76771:
         treat_er = 'Mito_stress_treatment/ER_stress/ATF4/results/matrix/RNA_seq/ATF4_ER_across_ATF4Tmc_Treatment_plotprofile.png',
         sil_er = 'Mito_stress_treatment/ER_stress/ATF4/results/matrix/RNA_seq/ATF4_ER_across_ATF4Tmc_Silencing_plotprofile.png'
     conda:
-        'envs/deeptools_env.yml'
+        '/projectnb/perissilab/Jawahar/GPS2_ChIPseq_Perissi-Lab/envs/deeptools_env.yml'
     shell:
         '''
         plotProfile -m {input.diff_aad} -o {output.diff_aad} --perGroup --plotTitle "ATF4_AAD with Tmc across GPS2 Differentiation"
@@ -644,11 +644,11 @@ rule computeMatrix_Treatment_over_RNAseq_mTORC1_GSE158605:
         aad = 'Mito_stress_treatment/Amino_acid_deprivation/ATF4/results/matrix/RNA_seq/ATF4_AAD_across_ATF4mTORC1_Treatment_matrix.gz',
         er = 'Mito_stress_treatment/ER_stress/ATF4/results/matrix/RNA_seq/ATF4_ER_across_ATF4mTORC1_Treatment_matrix.gz'
     conda:
-        'envs/deeptools_env.yml'
+        '/projectnb/perissilab/Jawahar/GPS2_ChIPseq_Perissi-Lab/envs/deeptools_env.yml'
     threads: 16
     shell:
         '''
-        computeMatrix reference-point --referencePoint center -S {input.ATF4_AAD_bw} {input.gps2_with_rep1} {input.gps2_with_rep2} {input.gps2_no_rep1} {input.gps2_no_rep2} -R {input.ATF4_ER_MTORC1_IR} {input.ATF4_ER_MTORC1_TT} --outFileName {output.aad} -p {threads}
+        computeMatrix reference-point --referencePoint center -S {input.ATF4_AAD_bw} {input.gps2_with_rep1} {input.gps2_with_rep2} {input.gps2_no_rep1} {input.gps2_no_rep2} -R {input.ATF4_AAD_mTORC1_IR} {input.ATF4_AAD_mTORC1_TT} --outFileName {output.aad} -p {threads}
         computeMatrix reference-point --referencePoint center -S {input.ATF4_WT_ER_bw} {input.ATF4_KO_ER_bw} {input.gps2_with_rep1} {input.gps2_with_rep2} {input.gps2_no_rep1} {input.gps2_no_rep2} -R {input.ATF4_ER_MTORC1_IR} {input.ATF4_ER_MTORC1_TT} --outFileName {output.er} -p {threads}
         '''
 
@@ -667,7 +667,7 @@ rule computeMatrix_Differentiation_over_RNAseq_mTORC1_GSE158605:
         aad = 'Mito_stress_treatment/Amino_acid_deprivation/ATF4/results/matrix/RNA_seq/ATF4_AAD_across_ATF4mTORC1_Differentiation_matrix.gz',
         er = 'Mito_stress_treatment/ER_stress/ATF4/results/matrix/RNA_seq/ATF4_ER_across_ATF4mTORC1_Differentiation_matrix.gz'
     conda:
-        'envs/deeptools_env.yml'
+        '/projectnb/perissilab/Jawahar/GPS2_ChIPseq_Perissi-Lab/envs/deeptools_env.yml'
     threads: 16
     shell:
         '''
@@ -690,7 +690,7 @@ rule computeMatrix_Silencing_over_RNAseq_mTORC1_GSE158605:
         aad = 'Mito_stress_treatment/Amino_acid_deprivation/ATF4/results/matrix/RNA_seq/ATF4_AAD_across_ATF4mTORC1_Silencing_matrix.gz',
         er = 'Mito_stress_treatment/ER_stress/ATF4/results/matrix/RNA_seq/ATF4_ER_across_ATF4mTORC1_Silencing_matrix.gz'
     conda:
-        'envs/deeptools_env.yml'
+        '/projectnb/perissilab/Jawahar/GPS2_ChIPseq_Perissi-Lab/envs/deeptools_env.yml'
     threads: 16
     shell:
         '''
@@ -714,7 +714,7 @@ rule Plotprofile_RNAseq_mTORC1_GSE15860:
         treat_er = 'Mito_stress_treatment/ER_stress/ATF4/results/matrix/RNA_seq/ATF4_ER_across_ATF4mTORC1_Treatment_plotprofile.png',
         sil_er = 'Mito_stress_treatment/ER_stress/ATF4/results/matrix/RNA_seq/ATF4_ER_across_ATF4mTORC1_Silencing_plotprofile.png'
     conda:
-        'envs/deeptools_env.yml'
+        '/projectnb/perissilab/Jawahar/GPS2_ChIPseq_Perissi-Lab/envs/deeptools_env.yml'
     shell:
         '''
         plotProfile -m {input.diff_aad} -o {output.diff_aad} --perGroup --plotTitle "ATF4_AAD in mTORC1 across GPS2 Differentiation"
@@ -740,7 +740,7 @@ rule computeMatrix_Treatment_over_RNAseq_multiomics_GSE84631:
         aad = 'Mito_stress_treatment/Amino_acid_deprivation/ATF4/results/matrix/RNA_seq/ATF4_AAD_overlap_Multiomics_Treatment_matrix.gz',
         er = 'Mito_stress_treatment/ER_stress/ATF4/results/matrix/RNA_seq/ATF4_ER_overlap_Multiomics_Treatment_matrix.gz'
     conda:
-        'envs/deeptools_env.yml'
+        '/projectnb/perissilab/Jawahar/GPS2_ChIPseq_Perissi-Lab/envs/deeptools_env.yml'
     threads: 16
     shell:
         '''
@@ -761,7 +761,7 @@ rule computeMatrix_Differentiation_over_RNAseq_multiomics_GSE84631:
         aad = 'Mito_stress_treatment/Amino_acid_deprivation/ATF4/results/matrix/RNA_seq/ATF4_AAD_overlap_Multiomics_Differentiation_matrix.gz',
         er = 'Mito_stress_treatment/ER_stress/ATF4/results/matrix/RNA_seq/ATF4_ER_overlap_Multiomics_Differentiation_matrix.gz'
     conda:
-        'envs/deeptools_env.yml'
+        '/projectnb/perissilab/Jawahar/GPS2_ChIPseq_Perissi-Lab/envs/deeptools_env.yml'
     threads: 16
     shell:
         '''
@@ -782,7 +782,7 @@ rule computeMatrix_Silencing_over_RNAseq_multiomics_GSE84631:
         aad = 'Mito_stress_treatment/Amino_acid_deprivation/ATF4/results/matrix/RNA_seq/ATF4_AAD_overlap_Multiomics_Silencing_matrix.gz',
         er = 'Mito_stress_treatment/ER_stress/ATF4/results/matrix/RNA_seq/ATF4_ER_overlap_Multiomics_Silencing_matrix.gz'
     conda:
-        'envs/deeptools_env.yml'
+        '/projectnb/perissilab/Jawahar/GPS2_ChIPseq_Perissi-Lab/envs/deeptools_env.yml'
     threads: 16
     shell:
         '''
@@ -806,7 +806,7 @@ rule Plotprofile_RNAseq_multiomics_GSE84631:
         treat_er = 'Mito_stress_treatment/ER_stress/ATF4/results/matrix/RNA_seq/ATF4_ER_overlap_Multiomics_Treatment_plotprofile.png',
         sil_er = 'Mito_stress_treatment/ER_stress/ATF4/results/matrix/RNA_seq/ATF4_ER_overlap_Multiomics_Silencing_plotprofile.png'
     conda:
-        'envs/deeptools_env.yml'
+        '/projectnb/perissilab/Jawahar/GPS2_ChIPseq_Perissi-Lab/envs/deeptools_env.yml'
     shell:
         '''
         plotProfile -m {input.diff_aad} -o {output.diff_aad} --perGroup --plotTitle "ATF4_AAD from Multiomics across GPS2 Differentiation"
@@ -834,7 +834,7 @@ rule computeMatrix_Treatment_over_TSS_of_RNAseq_multiomics_GSE84631:
         aad = 'Mito_stress_treatment/Amino_acid_deprivation/ATF4/results/matrix/RNA_seq/Multiomics_DE_regions_overTSS_Treatment_matrix.gz',
         alz = 'Mito_stress_treatment/Amino_acid_deprivation/ATF4/results/matrix/RNA_seq/Alzheimers_DE_regions_overTSS_Treatment_matrix.gz'
     conda:
-        'envs/deeptools_env.yml'
+        '/projectnb/perissilab/Jawahar/GPS2_ChIPseq_Perissi-Lab/envs/deeptools_env.yml'
     threads: 16
     shell:
         '''
@@ -857,7 +857,7 @@ rule computeMatrix_Differentiation_over_TSS_of_RNAseq_multiomics_GSE84631:
         aad = 'Mito_stress_treatment/Amino_acid_deprivation/ATF4/results/matrix/RNA_seq/Multiomics_DE_regions_overTSS_Differentiation1_matrix.gz',
         alz = 'Mito_stress_treatment/Amino_acid_deprivation/ATF4/results/matrix/RNA_seq/Alzheimers_DE_regions_overTSS_Differentiation_matrix.gz'
     conda:
-        'envs/deeptools_env.yml'
+        '/projectnb/perissilab/Jawahar/GPS2_ChIPseq_Perissi-Lab/envs/deeptools_env.yml'
     threads: 16
     shell:
         '''
@@ -880,7 +880,7 @@ rule computeMatrix_Silencing_over_TSS_of_RNAseq_multiomics_GSE84631:
         aad = 'Mito_stress_treatment/Amino_acid_deprivation/ATF4/results/matrix/RNA_seq/Multiomics_DE_regions_overTSS_Silencing_matrix.gz',
         alz = 'Mito_stress_treatment/Amino_acid_deprivation/ATF4/results/matrix/RNA_seq/Alzheimers_DE_regions_overTSS_Silencing_matrix.gz'
     conda:
-        'envs/deeptools_env.yml'
+        '/projectnb/perissilab/Jawahar/GPS2_ChIPseq_Perissi-Lab/envs/deeptools_env.yml'
     threads: 16
     shell:
         '''
@@ -904,7 +904,7 @@ rule Plotprofile_TSS_of_RNAseq_multiomics_GSE84631:
         treat_alz = 'Mito_stress_treatment/Amino_acid_deprivation/ATF4/results/matrix/RNA_seq/Alzheimers_DE_regions_overTSS_Treatment_plotprofile.png',
         sil_alz = 'Mito_stress_treatment/Amino_acid_deprivation/ATF4/results/matrix/RNA_seq/Alzheimers_DE_regions_overTSS_Silencing_plotprofile.png'
     conda:
-        'envs/deeptools_env.yml'
+        '/projectnb/perissilab/Jawahar/GPS2_ChIPseq_Perissi-Lab/envs/deeptools_env.yml'
     shell:
         '''
         plotProfile -m {input.diff_aad} -o {output.diff_aad} --perGroup --plotTitle "Differentiation - Centered across gene TSS from Multiomics"
@@ -938,7 +938,7 @@ rule overlaps_AAD:
         sigps2_aad = 'Mito_stress_treatment/Amino_acid_deprivation/ATF4/results/overlaps/sigps2_over_atf4_aad.bed',
         sictl_vs_sigps2_aad = 'Mito_stress_treatment/Amino_acid_deprivation/ATF4/results/overlaps/sictl_vs_sigps2_over_atf4_aad.bed'
     conda:
-        'envs/bedtools_env.yml'
+        '/projectnb/perissilab/Jawahar/GPS2_ChIPseq_Perissi-Lab/envs/bedtools_env.yml'
     shell:
         '''
         bedtools intersect -a {input.gps2_day0} -b {input.atf4_aad} > {output.day0_aad}
@@ -975,7 +975,7 @@ rule overlaps_WT_TMC:
         sigps2_wt_tmc = 'Mito_stress_treatment/Amino_acid_deprivation/ATF4/results/overlaps/sigps2_over_atf4_wt_tmc.bed',
         sictl_vs_sigps2_wt_tmc = 'Mito_stress_treatment/Amino_acid_deprivation/ATF4/results/overlaps/sictl_vs_sigps2_over_atf4_wt_tmc.bed'
     conda:
-        'envs/bedtools_env.yml'
+        '/projectnb/perissilab/Jawahar/GPS2_ChIPseq_Perissi-Lab/envs/bedtools_env.yml'
     shell:
         '''
         bedtools intersect -a {input.gps2_day0} -b {input.atf4_wt_tmc} > {output.day0_wt_tmc}
@@ -1012,7 +1012,7 @@ rule overlaps_KO_TMC:
         sigps2_ko_tmc = 'Mito_stress_treatment/Amino_acid_deprivation/ATF4/results/overlaps/sigps2_over_atf4_ko_tmc.bed',
         sictl_vs_sigps2_ko_tmc = 'Mito_stress_treatment/Amino_acid_deprivation/ATF4/results/overlaps/sictl_vs_sigps2_over_atf4_ko_tmc.bed'
     conda:
-        'envs/bedtools_env.yml'
+        '/projectnb/perissilab/Jawahar/GPS2_ChIPseq_Perissi-Lab/envs/bedtools_env.yml'
     shell:
         '''
         bedtools intersect -a {input.gps2_day0} -b {input.atf4_ko_tmc} > {output.day0_ko_tmc}
@@ -1049,7 +1049,7 @@ rule overlaps_WT_vs_KO_TMC:
         sigps2_wt_vs_ko = 'Mito_stress_treatment/Amino_acid_deprivation/ATF4/results/overlaps/sigps2_over_atf4_wt_vs_ko.bed',
         sictl_vs_sigps2_wt_vs_ko = 'Mito_stress_treatment/Amino_acid_deprivation/ATF4/results/overlaps/sictl_vs_sigps2_over_atf4_wt_vs_ko.bed'
     conda:
-        'envs/bedtools_env.yml'
+        '/projectnb/perissilab/Jawahar/GPS2_ChIPseq_Perissi-Lab/envs/bedtools_env.yml'
     shell:
         '''
         bedtools intersect -a {input.gps2_day0} -b {input.wt_vs_ko} > {output.day0_wt_vs_ko}
