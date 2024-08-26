@@ -1,0 +1,310 @@
+EXTENSIONS = [1, 2, 3, 4, 'rev.1', 'rev.2']
+
+rule all:
+    input:
+        'Differentiation/ATF4/results/fastqc/ATF4_noDMI_fastqc.html',
+        'Differentiation/ATF4/results/fastqc/ATF4_noDMI_fastqc.zip',
+        'Differentiation/ATF4/results/trimqc/ATF4_noDMI.trim_fastqc.html',
+        'Differentiation/ATF4/results/view/ATF4_noDMI.txt',
+        'Differentiation/ATF4/results/flagstat/ATF4_noDMI.txt',
+        'Differentiation/ATF4/results/multiqc/multiqc_report.html',
+        'Differentiation/ATF4/results/annotation/ATF4_noDMI_annotated.txt',
+        directory('Differentiation/ATF4/results/motifs'),
+        'Differentiation/ATF4/results/bigwig/ATF4_noDMI_matrix.gz',
+        'Differentiation/ATF4/results/ATF4_noDMI_Plotprofile.png'
+
+rule wget_files:
+    output:
+        'Differentiation/ATF4/results/ATF4_noDMI.fastq.gz'
+    shell:
+        'wget -O {output} ftp.sra.ebi.ac.uk/vol1/fastq/SRR202/000/SRR2025080/SRR2025080.fastq.gz'
+
+rule download_fasta:
+    output:
+        'samples/GRCh38_primary_assembly_genome.fa'
+    params:
+        fa = 'samples/GRCh38_primary_assembly_genome.fa.gz'
+    shell:
+        '''
+        wget -O {params.fa} https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_46/GRCh38.primary_assembly.genome.fa.gz
+        gunzip {params.fa}
+        '''
+
+rule fastqc:
+    input: 
+        'Differentiation/ATF4/results/ATF4_noDMI.fastq.gz'
+    output:
+        html = 'Differentiation/ATF4/results/fastqc/ATF4_noDMI_fastqc.html',
+        zip = 'Differentiation/ATF4/results/fastqc/ATF4_noDMI_fastqc.zip'
+    params:
+        outdir = 'Differentiation/ATF4/results/fastqc'
+    threads: 8
+    conda:
+        'envs/fastqc_env.yml'
+    shell:
+        '''
+        mkdir -p {params.outdir}
+        fastqc {input} -o {params.outdir}
+        '''
+
+rule trimomatic:
+    input:
+        fastq = 'Differentiation/ATF4/results/ATF4_noDMI.fastq.gz'
+    output:
+        trimmed = 'Differentiation/ATF4/results/trimmed/ATF4_noDMI.trim.fastq.gz'
+    params:
+        ad = 'samples/TruSeq3-SE.fa',
+        outdir = 'Differentiation/ATF4/results/trimmed'
+    threads: 8
+    conda:
+        'envs/trimmomatic_env.yml'
+    shell:
+        '''
+        wget -O {params.ad} https://github.com/usadellab/Trimmomatic/raw/main/adapters/TruSeq3-SE.fa
+        mkdir -p {params.outdir}
+        trimmomatic SE -threads {threads} -phred33 {input.fastq} {output.trimmed} ILLUMINACLIP:{params.ad}:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+        '''
+
+rule bowtie2_build_gencode:
+    input:
+        fa = 'samples/GRCh38_primary_assembly_genome.fa'
+    output:
+        expand('results/GRCh38.{ext}.bt2', ext=EXTENSIONS)
+    params:
+        outdir = 'results/GRCh38'
+    threads: 16
+    conda:
+        'envs/bowtie2_env.yml'
+    shell:
+        '''
+        bowtie2-build {input.fa} {params.outdir}
+        '''
+
+rule unzip_fq:
+    input:
+        samples = 'Differentiation/ATF4/results/trimmed/ATF4_noDMI.trim.fastq.gz'
+    output:
+        unzip = 'Differentiation/ATF4/results/trimmed/ATF4_noDMI.trim.fastq'
+    threads: 8
+    shell:
+        '''
+        gunzip -c {input.samples} > {output.unzip}
+        '''
+
+rule trimqc:
+    input: 
+        fastq = 'Differentiation/ATF4/results/trimmed/ATF4_noDMI.trim.fastq'
+    output:
+        fastqc = 'Differentiation/ATF4/results/trimqc/ATF4_noDMI.trim_fastqc.html'
+    params:
+        outdir = 'Differentiation/ATF4/results/trimqc'
+    threads: 4
+    conda:
+        'envs/fastqc_env.yml'
+    shell:
+        '''
+        mkdir -p {params.outdir}
+        fastqc {input.fastq} -o {params.outdir}
+        '''
+
+rule bowtie2_align:
+    input:
+        samples = 'Differentiation/ATF4/results/trimmed/ATF4_noDMI.trim.fastq',
+        bt2 = expand('results/GRCh38.{ext}.bt2', ext=EXTENSIONS)
+    output:
+        bam = 'Differentiation/ATF4/results/aligned/ATF4_noDMI.bam'
+    threads: 16
+    params:
+        index = 'results/GRCh38',
+        outdir = 'Differentiation/ATF4/results/aligned'
+    conda:
+        'envs/bowtie2_env.yml'
+    shell:
+        '''
+        mkdir -p {params.outdir}
+        bowtie2 -x {params.index} -U {input.samples} | samtools view -bS - > {output.bam}
+        '''
+
+rule samtools_sort:
+    input:
+        bam = 'Differentiation/ATF4/results/aligned/ATF4_noDMI.bam'
+    output:
+        sorted = 'Differentiation/ATF4/results/sorted/ATF4_noDMI.sorted.bam'
+    params:
+        outdir = 'Differentiation/ATF4/results/sorted'
+    conda:
+        'envs/samtools_env.yml'
+    threads: 8
+    shell:
+        '''
+        mkdir -p {params.outdir}
+        samtools sort -o {output.sorted} {input.bam} 
+        '''
+
+rule samtools_idxstats:
+    input:
+        sorted = 'Differentiation/ATF4/results/sorted/ATF4_noDMI.sorted.bam'
+    output:
+        index = 'Differentiation/ATF4/results/view/ATF4_noDMI.txt'
+    params:
+        outdir = 'Differentiation/ATF4/results/view'
+    conda:
+        'envs/samtools_env.yml'
+    threads: 8
+    shell:
+        '''
+        mkdir -p {params.outdir}
+        samtools idxstats {input.sorted} > {output.index}
+        '''
+
+rule samtools_idx:
+    input:
+        filter = 'Differentiation/ATF4/results/sorted/ATF4_noDMI.sorted.bam'
+    output:
+        index = 'Differentiation/ATF4/results/sorted/ATF4_noDMI.sorted.bam.bai'
+    conda:
+        'envs/samtools_env.yml'
+    threads: 8
+    shell:
+        '''
+        samtools index {input.filter} {output.index}
+        '''
+
+rule samtools_flagstats:
+    input:
+        filter = 'Differentiation/ATF4/results/sorted/ATF4_noDMI.sorted.bam'
+    output:
+        flagstat = 'Differentiation/ATF4/results/flagstat/ATF4_noDMI.txt'
+    params:
+        outdir = 'Differentiation/ATF4/results/flagstat'
+    conda:
+        'envs/samtools_env.yml'
+    threads: 8
+    shell:
+        '''
+        mkdir -p {params.outdir}
+        samtools flagstat {input.filter} > {output.flagstat}
+        '''
+
+rule multiqc:
+    input:
+        'Differentiation/ATF4/results/flagstat/ATF4_noDMI.txt'
+    output:
+        multiqc = 'Differentiation/ATF4/results/multiqc/multiqc_report.html'
+    params:
+        input = 'Differentiation/ATF4/results/',
+        output = 'Differentiation/ATF4/results/multiqc'
+    conda:
+        "envs/multiqc_env.yml"
+    shell:
+        """
+        multiqc {params.input} -o {params.output}
+        """
+
+rule bamCoverage:
+    input:
+        bam = 'Differentiation/ATF4/results/sorted/ATF4_noDMI.sorted.bam',
+        bai = 'Differentiation/ATF4/results/sorted/ATF4_noDMI.sorted.bam.bai'
+    output:
+        bigwig = 'Differentiation/ATF4/results/bigwig/ATF4_noDMI.bw'
+    threads: 8
+    conda:
+        'envs/deeptools_env.yml'
+    shell:
+        '''
+        bamCoverage -b {input.bam} -o {output.bigwig} 
+        '''
+
+rule callpeak:
+    input:
+        A = 'Differentiation/ATF4/results/sorted/ATF4_noDMI.sorted.bam',
+    output:
+        B = 'Differentiation/ATF4/results/macs3/ATF4_noDMI_peaks.narrowPeak'
+    params:
+        C = 'Differentiation/ATF4/results/macs3'
+    conda:
+        'envs/macs3_env.yml'
+    threads: 16
+    shell:
+        '''
+        macs3 callpeak -t {input.A} -f BAM -g 2913022398 -n ATF4_noDMI --nolambda -B -q 0.05 --outdir {params.C}
+        '''
+
+rule filter_blacklist:
+    input:
+        ATF4 = 'Differentiation/ATF4/results/macs3/ATF4_noDMI_peaks.narrowPeak',
+        blacklist = 'samples/hg38-blacklist.v2.bed'
+    output:
+        ATF4 = 'Differentiation/ATF4/results/filtered/ATF4_noDMI_bf.narrowPeak'
+    conda:
+        'envs/bedtools_env.yml'
+    shell:
+        '''
+        bedtools intersect -v -a {input.ATF4} -b {input.blacklist} > {output.ATF4}
+        '''
+
+rule unzip_gtf:
+    output:
+        'results/gencode.v46.basic.annotation.gtf'
+    params:
+        gtf = 'results/gencode.v46.basic.annotation.gtf.gz'
+    shell:
+        '''
+        wget -O {params.gtf} https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_46/gencode.v46.basic.annotation.gtf.gz
+        gunzip {params.gtf}
+        '''
+
+rule annotate_peaks:
+    input:
+        ATF4 = 'Differentiation/ATF4/results/filtered/ATF4_noDMI_bf.narrowPeak',
+        gttf = 'results/gencode.v46.basic.annotation.gtf'
+    output:
+        ATF4 = 'Differentiation/ATF4/results/annotation/ATF4_noDMI_annotated.txt',
+    conda:
+        'envs/homer_env.yml'
+    shell:
+        '''
+        perl /projectnb/perissilab/Jawahar/GPS2_ChIPseq_Perissi-Lab/.snakemake/conda/905a7da14e0860d0db0897ec5505b394_/share/homer/.//configureHomer.pl -install hg38
+        annotatePeaks.pl {input.ATF4} hg38 -gtf {input.gttf} > {output.ATF4}
+        '''
+
+rule motifs:
+    input:
+        ATF4 = 'Differentiation/ATF4/results/filtered/ATF4_noDMI_bf.narrowPeak',
+        fasta = 'samples/GRCh38_primary_assembly_genome.fa'
+    output:
+        ATF4 = directory('Differentiation/ATF4/results/motifs')
+    conda:
+        'envs/homer_env.yml'
+    shell:
+        '''
+        findMotifsGenome.pl {input.ATF4} {input.fasta} {output.ATF4} -size 200
+        '''
+
+rule computeMatrix:
+    input:
+        bigwig = 'Differentiation/ATF4/results/bigwig/ATF4_noDMI.bw',
+        bed = 'samples/hg38_all_genes.bed'
+    output:
+        'Differentiation/ATF4/results/bigwig/ATF4_noDMI_matrix.gz'
+    params:
+        window = 2000
+    conda:
+        'envs/deeptools_env.yml'
+    threads: 16
+    shell:
+        '''
+        computeMatrix scale-regions -S {input.bigwig} -R {input.bed} -a {params.window} -b {params.window} --outFileName {output}
+        '''
+
+rule plotMatrix:
+    input:
+        'Differentiation/ATF4/results/bigwig/ATF4_noDMI_matrix.gz'
+    output:
+        'Differentiation/ATF4/results/ATF4_noDMI_Plotprofile.png'
+    conda:
+        'envs/deeptools_env.yml'
+    shell:
+        '''
+        plotProfile -m {input} -o {output}
+        '''
