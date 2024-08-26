@@ -1,5 +1,0 @@
-﻿Directory,Treatment,Control,Peak_file
-Silencing/GPS2,chip_sictl,chip_sigps2,sictl_vs_sigps2
-Mito_stress_treatment/GPS2,"gps2_withFCCP_rep1;gps2_withFCCP_rep2","gps2_noFCCP_rep1;gps2_noFCCP_rep2",gps2_withFCCP_vsgps2_noFCCP
-Adipocyte_differentiation/GPS2,gps2_day6,gps2_day0,gps2_day6_vs_gps2_day0
-Mito_stress_treatment/ER_stress/ATF4,ATF4_WT_Tmc,ATF4_KO_Tmc,ATF4_WT_Tmc_vs_ATF4_KO_Tmc
