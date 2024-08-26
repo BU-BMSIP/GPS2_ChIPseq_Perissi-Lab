@@ -1,3 +1,0 @@
-Peak file   Condition   num_peaks
-chip_sictl  Wild-type   65315
-chip_sigps2 Wild-type   35541
